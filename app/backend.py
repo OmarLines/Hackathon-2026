@@ -552,7 +552,7 @@ class AwsBackend:
         if not referral:
             return
 
-        self.table.update_item(
+        self.referrals_table.update_item(
             Key={"pk": referral["pk"], "sk": referral["sk"]},
             UpdateExpression="SET #s = :s",
             ExpressionAttributeNames={"#s": "status"},
