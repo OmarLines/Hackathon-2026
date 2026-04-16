@@ -1,5 +1,13 @@
 # Family Hub Referral Portal
 
+![High-level AWS architecture](docs/architecture/high-level-aws-architecture.svg)
+
+Live app: http://3.11.190.150
+
+Test admin username: `admin`
+
+Test admin password: `admin`
+
 ## The Problem: Paper-Based Friction
 Early years professionals and healthcare staff (such as midwives or nursery workers) currently navigate a heavily manual, paper-based workflow to refer families to Family Hubs. The existing 4-page PDF ("Request for Children's Centre Service") creates significant administrative friction:
 - **No Visibility:** Neither the referrer nor the family can track the progress of a referral once sent.
