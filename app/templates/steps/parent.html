@@ -32,23 +32,36 @@
            value="{{ answers.parent_name or '' }}">
   </div>
 
-  <div class="govuk-form-group">
+  <div class="govuk-form-group {% if errors.parent_email %}govuk-form-group--error{% endif %}">
     <label class="govuk-label" for="parent_email">Email address (optional)</label>
-    <input class="govuk-input" id="parent_email" name="parent_email" type="email"
-           autocomplete="email" value="{{ answers.parent_email or '' }}">
+    {% if errors.parent_email %}
+    <p id="parent_email-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.parent_email }}
+    </p>
+    {% endif %}
+    <input class="govuk-input {% if errors.parent_email %}govuk-input--error{% endif %}"
+           id="parent_email" name="parent_email" type="email"
+           autocomplete="email" value="{{ answers.parent_email or '' }}"
+           aria-describedby="{% if errors.parent_email %}parent_email-error{% endif %}">
   </div>
 
-  <div class="govuk-form-group">
-    <fieldset class="govuk-fieldset" role="group" aria-describedby="parent-dob-hint">
+  <div class="govuk-form-group {% if errors.parent_dob %}govuk-form-group--error{% endif %}">
+    <fieldset class="govuk-fieldset" role="group"
+              aria-describedby="parent-dob-hint {% if errors.parent_dob %}parent_dob-error{% endif %}">
       <legend class="govuk-fieldset__legend">
         <span class="govuk-label">Date of birth (optional)</span>
       </legend>
       <div id="parent-dob-hint" class="govuk-hint">For example, 14 6 1985</div>
+      {% if errors.parent_dob %}
+      <p id="parent_dob-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors.parent_dob }}
+      </p>
+      {% endif %}
       <div class="govuk-date-input" id="parent_dob">
         <div class="govuk-date-input__item">
           <div class="govuk-form-group">
             <label class="govuk-label govuk-date-input__label" for="parent_dob_day">Day</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-2"
+            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.parent_dob %}govuk-input--error{% endif %}"
                    id="parent_dob_day" name="parent_dob_day" type="text" inputmode="numeric"
                    value="{{ answers.parent_dob_day or '' }}">
           </div>
@@ -56,7 +69,7 @@
         <div class="govuk-date-input__item">
           <div class="govuk-form-group">
             <label class="govuk-label govuk-date-input__label" for="parent_dob_month">Month</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-2"
+            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.parent_dob %}govuk-input--error{% endif %}"
                    id="parent_dob_month" name="parent_dob_month" type="text" inputmode="numeric"
                    value="{{ answers.parent_dob_month or '' }}">
           </div>
@@ -64,7 +77,7 @@
         <div class="govuk-date-input__item">
           <div class="govuk-form-group">
             <label class="govuk-label govuk-date-input__label" for="parent_dob_year">Year</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-4"
+            <input class="govuk-input govuk-date-input__input govuk-input--width-4 {% if errors.parent_dob %}govuk-input--error{% endif %}"
                    id="parent_dob_year" name="parent_dob_year" type="text" inputmode="numeric"
                    value="{{ answers.parent_dob_year or '' }}">
           </div>
@@ -73,10 +86,17 @@
     </fieldset>
   </div>
 
-  <div class="govuk-form-group">
+  <div class="govuk-form-group {% if errors.family_tel %}govuk-form-group--error{% endif %}">
     <label class="govuk-label" for="family_tel">Family telephone number (optional)</label>
-    <input class="govuk-input govuk-input--width-20" id="family_tel" name="family_tel"
-           type="tel" autocomplete="tel" value="{{ answers.family_tel or '' }}">
+    {% if errors.family_tel %}
+    <p id="family_tel-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.family_tel }}
+    </p>
+    {% endif %}
+    <input class="govuk-input govuk-input--width-20 {% if errors.family_tel %}govuk-input--error{% endif %}"
+           id="family_tel" name="family_tel" type="tel" autocomplete="tel"
+           value="{{ answers.family_tel or '' }}"
+           aria-describedby="{% if errors.family_tel %}family_tel-error{% endif %}">
   </div>
 
   <div class="govuk-form-group {% if errors.locality %}govuk-form-group--error{% endif %}">

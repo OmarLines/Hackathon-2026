@@ -1,4 +1,5 @@
 import uuid
+import re
 from datetime import date
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from .store import referrers, referees
@@ -70,10 +71,19 @@ def validate_address(data):
         errors["address_line1"] = "Enter the first line of the address"
     if not data.get("town", "").strip():
         errors["town"] = "Enter the town or city"
-    if not data.get("postcode", "").strip():
+    
+    postcode = data.get("postcode", "").strip().upper()
+    if not postcode:
         errors["postcode"] = "Enter the postcode"
-    if not data.get("tel_no", "").strip():
+    elif not re.match(r"^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$", postcode):
+        errors["postcode"] = "Enter a real postcode"
+        
+    tel_no = data.get("tel_no", "").strip()
+    if not tel_no:
         errors["tel_no"] = "Enter a telephone number"
+    elif not re.match(r"^[0-9\s\+\-\(\)]{7,20}$", tel_no):
+        errors["tel_no"] = "Enter a real telephone number"
+        
     return errors
 
 
@@ -81,6 +91,29 @@ def validate_parent(data):
     errors = {}
     if not data.get("parent_name", "").strip():
         errors["parent_name"] = "Enter the parent or carer's name"
+    
+    email = data.get("parent_email", "").strip()
+    if email and not re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
+        errors["parent_email"] = "Enter a real email address"
+        
+    day = data.get("parent_dob_day", "").strip()
+    month = data.get("parent_dob_month", "").strip()
+    year = data.get("parent_dob_year", "").strip()
+    if day or month or year:
+        if not day or not month or not year:
+            errors["parent_dob"] = "Enter the parent's full date of birth"
+        else:
+            try:
+                dob = date(int(year), int(month), int(day))
+                if dob > date.today():
+                    errors["parent_dob"] = "Date of birth must be in the past"
+            except ValueError:
+                errors["parent_dob"] = "Enter a real date of birth"
+                
+    family_tel = data.get("family_tel", "").strip()
+    if family_tel and not re.match(r"^[0-9\s\+\-\(\)]{7,20}$", family_tel):
+        errors["family_tel"] = "Enter a real telephone number"
+        
     if not data.get("locality", "").strip():
         errors["locality"] = "Enter the locality"
     return errors
@@ -92,14 +125,16 @@ def validate_referrer(data):
         errors["referrer_name"] = "Enter the referrer's name"
     if not data.get("role_agency", "").strip():
         errors["role_agency"] = "Enter the role or agency"
-    day = data.get("referral_date_day", "")
-    month = data.get("referral_date_month", "")
-    year = data.get("referral_date_year", "")
+    day = data.get("referral_date_day", "").strip()
+    month = data.get("referral_date_month", "").strip()
+    year = data.get("referral_date_year", "").strip()
     if not day or not month or not year:
         errors["referral_date"] = "Enter the date of referral"
     else:
         try:
-            date(int(year), int(month), int(day))
+            ref_date = date(int(year), int(month), int(day))
+            if ref_date > date.today():
+                errors["referral_date"] = "Date of referral must be in the past"
         except ValueError:
             errors["referral_date"] = "Enter a real date of referral"
     return errors
