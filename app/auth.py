@@ -185,7 +185,12 @@ def login() -> Response | str:
             password = request.form.get("admin_password", "")
             admin_email = current_app.config.get("ADMIN_EMAIL")
             admin_password = current_app.config.get("ADMIN_PASSWORD")
-            if admin_email and admin_password and email == admin_email and password == admin_password:
+            if (
+                admin_email
+                and admin_password
+                and email == admin_email
+                and password == admin_password
+            ):
                 session["user"] = {"type": "admin", "email": email, "name": "Admin"}
                 return redirect(url_for("auth.admin_dashboard"))
             errors["admin_login"] = "Incorrect admin email or password"

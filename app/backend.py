@@ -214,11 +214,17 @@ class LocalBackend:
             referral["status"] = status
 
     def list_all_referrals(self) -> list[dict[str, Any]]:
-        return sorted(referees.values(), key=lambda r: r.get("created_at", ""), reverse=True)
+        return sorted(
+            referees.values(), key=lambda r: r.get("created_at", ""), reverse=True
+        )
 
     def list_all_referrers(self) -> list[dict[str, Any]]:
         return [
-            {"email": email, "name": r.get("name", ""), "referral_count": len(r.get("referrals", []))}
+            {
+                "email": email,
+                "name": r.get("name", ""),
+                "referral_count": len(r.get("referrals", [])),
+            }
             for email, r in referrers.items()
         ]
 
@@ -570,7 +576,11 @@ class AwsBackend:
         )
         items = response.get("Items", [])
         return [
-            {"email": i.get("email", ""), "name": i.get("name", ""), "referral_count": None}
+            {
+                "email": i.get("email", ""),
+                "name": i.get("name", ""),
+                "referral_count": None,
+            }
             for i in items
         ]
 
