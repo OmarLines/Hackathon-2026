@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from typing import Any
 
 from flask import current_app
 
@@ -13,7 +12,12 @@ def get_admin_credentials() -> dict[str, str] | None:
 
     username = current_app.config.get("ADMIN_USERNAME")
     password = current_app.config.get("ADMIN_PASSWORD")
-    if isinstance(username, str) and isinstance(password, str) and username and password:
+    if (
+        isinstance(username, str)
+        and isinstance(password, str)
+        and username
+        and password
+    ):
         return {"username": username, "password": password}
     return None
 
