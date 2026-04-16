@@ -54,6 +54,8 @@ class AppBackend(Protocol):
     def save_referrer_details(
         self, user: dict[str, Any], referrer_name: str, role_agency: str
     ) -> None: ...
+    def list_all_referrals(self) -> list[dict[str, Any]]: ...
+    def list_all_referrers(self) -> list[dict[str, Any]]: ...
 
 
 def build_backend(config: dict[str, Any]) -> AppBackend:
@@ -210,6 +212,15 @@ class LocalBackend:
         referral = referees.get(ref_number)
         if referral:
             referral["status"] = status
+
+    def list_all_referrals(self) -> list[dict[str, Any]]:
+        return sorted(referees.values(), key=lambda r: r.get("created_at", ""), reverse=True)
+
+    def list_all_referrers(self) -> list[dict[str, Any]]:
+        return [
+            {"email": email, "name": r.get("name", ""), "referral_count": len(r.get("referrals", []))}
+            for email, r in referrers.items()
+        ]
 
     def _ensure_referrer_defaults(self, email: str, referrer: dict[str, Any]) -> None:
         referrer.setdefault("form_access", {self.form_id})
@@ -541,6 +552,27 @@ class AwsBackend:
             ExpressionAttributeNames={"#s": "status"},
             ExpressionAttributeValues={":s": status},
         )
+
+    def list_all_referrals(self) -> list[dict[str, Any]]:
+        from boto3.dynamodb.conditions import Attr
+
+        response = self.referrals_table.scan(
+            FilterExpression=Attr("entity_type").eq("REFERRAL")
+        )
+        items = response.get("Items", [])
+        return sorted(items, key=lambda r: r.get("created_at", ""), reverse=True)
+
+    def list_all_referrers(self) -> list[dict[str, Any]]:
+        from boto3.dynamodb.conditions import Attr
+
+        response = self.referrals_table.scan(
+            FilterExpression=Attr("entity_type").eq("REFERRER_PROFILE")
+        )
+        items = response.get("Items", [])
+        return [
+            {"email": i.get("email", ""), "name": i.get("name", ""), "referral_count": None}
+            for i in items
+        ]
 
     def _form_access_sk(self, form_id: str) -> str:
         return f"FORM_ACCESS#{form_id}"

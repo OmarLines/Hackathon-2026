@@ -180,6 +180,16 @@ def login() -> Response | str:
                 return redirect(url_for("auth.dashboard"))
             errors["referee_login"] = "Incorrect reference number or postcode"
 
+        elif user_type == "admin":
+            email = request.form.get("admin_email", "").strip().lower()
+            password = request.form.get("admin_password", "")
+            admin_email = current_app.config.get("ADMIN_EMAIL")
+            admin_password = current_app.config.get("ADMIN_PASSWORD")
+            if admin_email and admin_password and email == admin_email and password == admin_password:
+                session["user"] = {"type": "admin", "email": email, "name": "Admin"}
+                return redirect(url_for("auth.admin_dashboard"))
+            errors["admin_login"] = "Incorrect admin email or password"
+
     return render_template(
         "login.html",
         errors=errors,
@@ -215,10 +225,30 @@ def dashboard() -> Response | str:
             service_labels=SERVICE_LABELS,
         )
 
+    if user["type"] == "admin":
+        return redirect(url_for("auth.admin_dashboard"))
+
     referee = get_backend().get_referral(user["ref_number"]) or {}
     return render_template(
         "dashboard_referee.html",
         user=user,
         referral=referee,
+        service_labels=SERVICE_LABELS,
+    )
+
+
+@auth_bp.route("/admin")
+def admin_dashboard() -> Response | str:
+    user = session.get("user")
+    if not user or user.get("type") != "admin":
+        return redirect(url_for("auth.login"))
+
+    all_referrals = get_backend().list_all_referrals()
+    all_referrers = get_backend().list_all_referrers()
+    return render_template(
+        "dashboard_admin.html",
+        user=user,
+        referrals=all_referrals,
+        referrers=all_referrers,
         service_labels=SERVICE_LABELS,
     )

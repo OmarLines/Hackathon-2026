@@ -118,6 +118,41 @@
 
         </div>
 
+        <!-- Admin divider -->
+        <div class="govuk-radios__divider">or</div>
+
+        <!-- Admin option -->
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="user_type-admin" name="user_type"
+                 type="radio" value="admin"
+                 {% if form.get('user_type') == 'admin' %}checked{% endif %}>
+          <label class="govuk-label govuk-radios__label" for="user_type-admin">
+            I am an administrator
+          </label>
+        </div>
+
+        <div id="admin-fields" style="display:none; margin-left: 2rem; margin-top: 1rem">
+
+          <div class="govuk-form-group {% if errors.admin_login %}govuk-form-group--error{% endif %}">
+            <label class="govuk-label" for="admin_email">Admin email</label>
+            {% if errors.admin_login %}
+            <p id="admin_email-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ errors.admin_login }}
+            </p>
+            {% endif %}
+            <input class="govuk-input {% if errors.admin_login %}govuk-input--error{% endif %}"
+                   id="admin_email" name="admin_email" type="email" autocomplete="email"
+                   value="{{ form.get('admin_email', '') }}">
+          </div>
+
+          <div class="govuk-form-group {% if errors.admin_login %}govuk-form-group--error{% endif %}">
+            <label class="govuk-label" for="admin_password">Admin password</label>
+            <input class="govuk-input {% if errors.admin_login %}govuk-input--error{% endif %}"
+                   id="admin_password" name="admin_password" type="password" autocomplete="current-password">
+          </div>
+
+        </div>
+
       </div>
     </fieldset>
   </div>
@@ -135,12 +170,18 @@
 {% block scripts %}
 <script>
   const radios = document.querySelectorAll('input[name="user_type"]');
-  const panels = { referrer: document.getElementById('referrer-fields'), referee: document.getElementById('referee-fields') };
+  const panels = {
+    referrer: document.getElementById('referrer-fields'),
+    referee: document.getElementById('referee-fields'),
+    admin: document.getElementById('admin-fields'),
+  };
 
   function updatePanels() {
     const selected = document.querySelector('input[name="user_type"]:checked');
-    panels.referrer.style.display = (selected && selected.value === 'referrer') ? 'block' : 'none';
-    panels.referee.style.display  = (selected && selected.value === 'referee')  ? 'block' : 'none';
+    const val = selected ? selected.value : null;
+    Object.entries(panels).forEach(([key, el]) => {
+      if (el) el.style.display = (val === key) ? 'block' : 'none';
+    });
   }
 
   radios.forEach(r => r.addEventListener('change', updatePanels));
