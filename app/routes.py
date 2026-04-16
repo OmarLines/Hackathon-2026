@@ -8,18 +8,28 @@ bp = Blueprint("main", __name__)
 
 def require_referrer(f):
     from functools import wraps
+
     @wraps(f)
     def decorated(*args, **kwargs):
         user = session.get("user")
         if not user or user.get("type") != "referrer":
             return redirect(url_for("auth.login"))
         return f(*args, **kwargs)
+
     return decorated
 
+
 STEPS = [
-    "child", "address", "parent", "referrer",
-    "service_type", "service_selection", "additional_info",
-    "consent", "check", "confirmation",
+    "child",
+    "address",
+    "parent",
+    "referrer",
+    "service_type",
+    "service_selection",
+    "additional_info",
+    "consent",
+    "check",
+    "confirmation",
 ]
 
 
@@ -112,7 +122,9 @@ def validate_service_selection(data):
 def validate_consent(data):
     errors = {}
     if not data.get("registered_sure_start"):
-        errors["registered_sure_start"] = "Confirm the family is registered with Sure Start Children's Centre"
+        errors["registered_sure_start"] = (
+            "Confirm the family is registered with Sure Start Children's Centre"
+        )
     if not data.get("verbal_consent"):
         errors["verbal_consent"] = "Select whether verbal consent was given"
     return errors
@@ -129,10 +141,30 @@ VALIDATORS = {
 }
 
 FORM_FIELDS = {
-    "child": ["child_name", "child_dob_day", "child_dob_month", "child_dob_year", "gender"],
+    "child": [
+        "child_name",
+        "child_dob_day",
+        "child_dob_month",
+        "child_dob_year",
+        "gender",
+    ],
     "address": ["address_line1", "address_line2", "town", "postcode", "tel_no"],
-    "parent": ["parent_name", "parent_email", "parent_dob_day", "parent_dob_month", "parent_dob_year", "family_tel", "locality"],
-    "referrer": ["referrer_name", "role_agency", "referral_date_day", "referral_date_month", "referral_date_year"],
+    "parent": [
+        "parent_name",
+        "parent_email",
+        "parent_dob_day",
+        "parent_dob_month",
+        "parent_dob_year",
+        "family_tel",
+        "locality",
+    ],
+    "referrer": [
+        "referrer_name",
+        "role_agency",
+        "referral_date_day",
+        "referral_date_month",
+        "referral_date_year",
+    ],
     "service_type": ["service_type"],
     "service_selection": ["service"],
     "additional_info": ["additional_info"],
@@ -158,7 +190,9 @@ SERVICE_OPTIONS = {
     ],
 }
 
-SERVICE_LABELS = {v: label for options in SERVICE_OPTIONS.values() for v, label in options}
+SERVICE_LABELS = {
+    v: label for options in SERVICE_OPTIONS.values() for v, label in options
+}
 
 
 @bp.route("/")
@@ -191,7 +225,9 @@ def step(step_name):
     if request.method == "POST":
         form_data = request.form.to_dict()
         if step_name == "consent":
-            form_data["registered_sure_start"] = form_data.get("registered_sure_start", "")
+            form_data["registered_sure_start"] = form_data.get(
+                "registered_sure_start", ""
+            )
 
         validator = VALIDATORS.get(step_name)
         if validator:
@@ -207,11 +243,15 @@ def step(step_name):
     if step_name == "service_selection":
         service_type = answers.get("service_type", "prevention")
         extra["service_options"] = SERVICE_OPTIONS.get(service_type, [])
-        extra["service_type_label"] = "Prevention" if service_type == "prevention" else "Intervention"
+        extra["service_type_label"] = (
+            "Prevention" if service_type == "prevention" else "Intervention"
+        )
 
     extra["prev_step"] = prev_step(step_name)
 
-    return render_template(f"steps/{step_name}.html", answers=answers, errors=errors, **extra)
+    return render_template(
+        f"steps/{step_name}.html", answers=answers, errors=errors, **extra
+    )
 
 
 @bp.route("/apply/check", methods=["GET", "POST"])
@@ -240,7 +280,12 @@ def check():
 
         return redirect(url_for("main.confirmation"))
 
-    return render_template("steps/check.html", answers=answers, service_labels=SERVICE_LABELS, prev_step="consent")
+    return render_template(
+        "steps/check.html",
+        answers=answers,
+        service_labels=SERVICE_LABELS,
+        prev_step="consent",
+    )
 
 
 @bp.route("/apply/confirmation")
@@ -250,4 +295,6 @@ def confirmation():
     if not ref:
         return redirect(url_for("main.index"))
     referee = referees.get(ref, {})
-    return render_template("steps/confirmation.html", ref=ref, postcode=referee.get("postcode", ""))
+    return render_template(
+        "steps/confirmation.html", ref=ref, postcode=referee.get("postcode", "")
+    )

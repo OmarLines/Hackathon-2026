@@ -42,7 +42,11 @@ def register():
             session["user"] = {"type": "referrer", "email": email, "name": name}
             return redirect(url_for("auth.dashboard"))
 
-    return render_template("register.html", errors=errors, form=request.form if request.method == "POST" else {})
+    return render_template(
+        "register.html",
+        errors=errors,
+        form=request.form if request.method == "POST" else {},
+    )
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
@@ -63,7 +67,11 @@ def login():
             password = request.form.get("password", "")
             referrer = referrers.get(email)
             if referrer and check_password_hash(referrer["password_hash"], password):
-                session["user"] = {"type": "referrer", "email": email, "name": referrer["name"]}
+                session["user"] = {
+                    "type": "referrer",
+                    "email": email,
+                    "name": referrer["name"],
+                }
                 return redirect(url_for("auth.dashboard"))
             errors["referrer_login"] = "Incorrect email address or password"
 
@@ -80,7 +88,11 @@ def login():
                 return redirect(url_for("auth.dashboard"))
             errors["referee_login"] = "Incorrect reference number or postcode"
 
-    return render_template("login.html", errors=errors, form=request.form if request.method == "POST" else {})
+    return render_template(
+        "login.html",
+        errors=errors,
+        form=request.form if request.method == "POST" else {},
+    )
 
 
 @auth_bp.route("/logout")
@@ -97,8 +109,12 @@ def dashboard():
 
     if user["type"] == "referrer":
         referrer = referrers.get(user["email"], {})
-        submitted = [referees[r] for r in referrer.get("referrals", []) if r in referees]
-        return render_template("dashboard_referrer.html", user=user, referrals=submitted)
+        submitted = [
+            referees[r] for r in referrer.get("referrals", []) if r in referees
+        ]
+        return render_template(
+            "dashboard_referrer.html", user=user, referrals=submitted
+        )
 
     referee = referees.get(user["ref_number"], {})
     return render_template("dashboard_referee.html", user=user, referral=referee)
