@@ -7,3 +7,5 @@
 - [x] Professionals can see acceptance status of referrals
 - [x] Resolve the type inconsistency in routes.py (standardized on flask.Response)
 - [x] Removed deprecated field in the pyproject.toml
+- [x] Create deployment documentation (live and dev)
+- [x] Add CI job for documentation generation
