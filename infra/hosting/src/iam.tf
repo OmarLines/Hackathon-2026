@@ -66,7 +66,10 @@ data "aws_iam_policy_document" "app_backend_access" {
       "secretsmanager:DescribeSecret",
       "secretsmanager:GetSecretValue",
     ]
-    resources = [data.terraform_remote_state.cognito.outputs.notify_api_key_secret_arn]
+    resources = [
+      data.terraform_remote_state.cognito.outputs.notify_api_key_secret_arn,
+      data.terraform_remote_state.cognito.outputs.admin_credentials_secret_arn,
+    ]
   }
 }
 
