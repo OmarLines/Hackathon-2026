@@ -25,6 +25,9 @@ def create_app():
         COGNITO_USER_POOL_ID=os.getenv("COGNITO_USER_POOL_ID"),
         CURRENT_FORM_ID=os.getenv("CURRENT_FORM_ID", "children-centre-services"),
         NOTIFY_API_KEY_SECRET_NAME=os.getenv("NOTIFY_API_KEY_SECRET_NAME"),
+        NOTIFY_REFERRAL_LOGIN_DETAILS_TEMPLATE_ID=os.getenv(
+            "NOTIFY_REFERRAL_LOGIN_DETAILS_TEMPLATE_ID"
+        ),
         NOTIFY_REFERRER_REGISTRATION_TEMPLATE_ID=os.getenv(
             "NOTIFY_REFERRER_REGISTRATION_TEMPLATE_ID"
         ),

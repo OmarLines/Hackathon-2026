@@ -6,31 +6,49 @@ from typing import Any, Protocol
 from flask import current_app
 
 
-class RegistrationNotifier(Protocol):
+class AppNotifier(Protocol):
     def send_referrer_registration_email(self, email_address: str, name: str, sign_in_url: str) -> None: ...
+    def send_referral_login_details_email(
+        self,
+        email_address: str,
+        ref_number: str,
+        postcode: str,
+    ) -> None: ...
 
 
-def build_notifier(config: dict[str, Any]) -> RegistrationNotifier:
-    template_id = config.get("NOTIFY_REFERRER_REGISTRATION_TEMPLATE_ID")
+def build_notifier(config: dict[str, Any]) -> AppNotifier:
+    referral_login_details_template_id = config.get(
+        "NOTIFY_REFERRAL_LOGIN_DETAILS_TEMPLATE_ID"
+    )
+    registration_template_id = config.get("NOTIFY_REFERRER_REGISTRATION_TEMPLATE_ID")
     secret_name = config.get("NOTIFY_API_KEY_SECRET_NAME")
 
-    if not template_id or not secret_name:
+    if not secret_name:
         return NullNotifier()
 
     return NotifyNotifier(
         aws_region=config.get("AWS_REGION", "eu-west-2"),
         notify_api_key_secret_name=secret_name,
+        referral_login_details_template_id=referral_login_details_template_id,
+        registration_template_id=registration_template_id,
         service_name=config.get("SERVICE_NAME", "Request for Children's Centre Service"),
-        template_id=template_id,
     )
 
 
-def get_notifier() -> RegistrationNotifier:
+def get_notifier() -> AppNotifier:
     return current_app.extensions["registration_notifier"]
 
 
 class NullNotifier:
     def send_referrer_registration_email(self, email_address: str, name: str, sign_in_url: str) -> None:
+        return None
+
+    def send_referral_login_details_email(
+        self,
+        email_address: str,
+        ref_number: str,
+        postcode: str,
+    ) -> None:
         return None
 
 
@@ -39,8 +57,9 @@ class NotifyNotifier:
         self,
         aws_region: str,
         notify_api_key_secret_name: str,
+        referral_login_details_template_id: str | None,
+        registration_template_id: str | None,
         service_name: str,
-        template_id: str,
     ) -> None:
         import boto3
         from notifications_python_client.notifications import NotificationsAPIClient
@@ -48,19 +67,42 @@ class NotifyNotifier:
         self.notification_client_cls = NotificationsAPIClient
         self.notify_api_key_secret_name = notify_api_key_secret_name
         self.secretsmanager = boto3.client("secretsmanager", region_name=aws_region)
+        self.referral_login_details_template_id = referral_login_details_template_id
+        self.registration_template_id = registration_template_id
         self.service_name = service_name
-        self.template_id = template_id
         self._api_key: str | None = None
 
     def send_referrer_registration_email(self, email_address: str, name: str, sign_in_url: str) -> None:
+        if not self.registration_template_id:
+            return None
+
         client = self.notification_client_cls(api_key=self._get_api_key())
         client.send_email_notification(
             email_address=email_address,
-            template_id=self.template_id,
+            template_id=self.registration_template_id,
             personalisation={
                 "name": name,
                 "service_name": self.service_name,
                 "sign_in_url": sign_in_url,
+            },
+        )
+
+    def send_referral_login_details_email(
+        self,
+        email_address: str,
+        ref_number: str,
+        postcode: str,
+    ) -> None:
+        if not self.referral_login_details_template_id:
+            return None
+
+        client = self.notification_client_cls(api_key=self._get_api_key())
+        client.send_email_notification(
+            email_address=email_address,
+            template_id=self.referral_login_details_template_id,
+            personalisation={
+                "ref_number": ref_number,
+                "postcode": postcode,
             },
         )
 
