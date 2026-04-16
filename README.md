@@ -43,6 +43,13 @@ terraform -chdir=infra/cognito/src apply tfplan
 
 ```powershell
 $env:AWS_PROFILE='co-hackathon'
+terraform -chdir=infra/dynamodb/src init
+terraform -chdir=infra/dynamodb/src plan -out=tfplan
+terraform -chdir=infra/dynamodb/src apply tfplan
+```
+
+```powershell
+$env:AWS_PROFILE='co-hackathon'
 terraform -chdir=infra/hosting/src init
 terraform -chdir=infra/hosting/src plan -out=tfplan
 terraform -chdir=infra/hosting/src apply tfplan
