@@ -77,9 +77,7 @@ def _password_error(config: dict[str, object]) -> str:
 
 
 def _email_is_valid(email: str) -> bool:
-    return bool(
-        re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email)
-    )
+    return bool(re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email))
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
