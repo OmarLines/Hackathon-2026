@@ -24,7 +24,7 @@ High Friction for Parents: Families—who may already be in vulnerable situation
 
 Inefficient Processing & Data Silos: Family Hub administration must manually transcribe data from emailed PDFs into internal systems. This slows down triage, delays assigning a caseworker, and leaves Service Managers without real-time analytics regarding referral volumes and physical check-ins.
 
-## Our objetive:
+## Our objective:
 
 To replace the legacy PDF referral process with a streamlined, end-to-end digital portal. By introducing rapid digital registration, automated caseworker routing, and unique family IDs for self-service check-ins, this project aims to reduce referral turnaround times from days to minutes—ensuring families get connected to the support they need with zero administrative friction.
 
