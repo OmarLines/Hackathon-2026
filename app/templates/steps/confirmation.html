@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Application submitted{% endblock %}
+{% block content %}
+<div class="govuk-panel govuk-panel--confirmation">
+  <h1 class="govuk-panel__title">Application submitted</h1>
+  <div class="govuk-panel__body">
+    Your reference number<br>
+    <strong>{{ ref }}</strong>
+  </div>
+</div>
+
+<p class="govuk-body">We have received your licence application.</p>
+
+<h2 class="govuk-heading-m">What happens next</h2>
+<p class="govuk-body">We will review your application and contact you within 10 working days.</p>
+<p class="govuk-body">If we need more information, we will contact you using the details you provided.</p>
+
+<p class="govuk-body">
+  <a href="/" class="govuk-link">Submit another application</a>
+</p>
+{% endblock %}

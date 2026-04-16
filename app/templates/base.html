@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" class="govuk-template">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}Licence Application{% endblock %} – GOV.UK</title>
+  <link rel="stylesheet" href="https://unpkg.com/govuk-frontend@5.4.1/dist/govuk/govuk-frontend.min.css">
+</head>
+<body class="govuk-template__body">
+  <script>document.body.className += ' js-enabled';</script>
+
+  <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+
+  <header class="govuk-header" role="banner" data-module="govuk-header">
+    <div class="govuk-header__container govuk-width-container">
+      <div class="govuk-header__logo">
+        <a href="/" class="govuk-header__link govuk-header__link--homepage">
+          <span class="govuk-header__logotype">
+            <span class="govuk-header__logotype-text">GOV.UK</span>
+          </span>
+        </a>
+      </div>
+      <div class="govuk-header__content">
+        <a href="/" class="govuk-header__link govuk-header__service-name">Apply for a licence</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="govuk-width-container">
+    <main class="govuk-main-wrapper" id="main-content" role="main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <footer class="govuk-footer" role="contentinfo">
+    <div class="govuk-width-container">
+      <div class="govuk-footer__meta">
+        <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+          <span class="govuk-footer__licence-description">
+            Built for the AI Engineering Lab Hackathon 2026
+          </span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="https://unpkg.com/govuk-frontend@5.4.1/dist/govuk/govuk-frontend.min.js"></script>
+  <script type="module">
+    import { initAll } from 'https://unpkg.com/govuk-frontend@5.4.1/dist/govuk/govuk-frontend.min.js';
+    initAll();
+  </script>
+</body>
+</html>
