@@ -35,7 +35,9 @@ def require_referrer(f: T) -> T:
             session.clear()
             return redirect(url_for("auth.login"))
         session["user"] = hydrated_user
-        if not get_backend().has_form_access(hydrated_user, current_app.config["CURRENT_FORM_ID"]):
+        if not get_backend().has_form_access(
+            hydrated_user, current_app.config["CURRENT_FORM_ID"]
+        ):
             abort(403)
         return f(*args, **kwargs)
 
@@ -327,7 +329,9 @@ def check() -> Response | str:
     if request.method == "POST":
         ref: str = str(uuid.uuid4())[:8].upper()
         session["ref"] = ref
-        get_backend().create_referral(user=session["user"], answers=answers, ref_number=ref)
+        get_backend().create_referral(
+            user=session["user"], answers=answers, ref_number=ref
+        )
 
         return redirect(url_for("main.confirmation"))
 

@@ -26,15 +26,25 @@ class InvalidReferrerPasswordError(RuntimeError):
 
 
 class AppBackend(Protocol):
-    def authenticate_referee(self, ref_number: str, postcode: str) -> dict[str, Any] | None: ...
-    def authenticate_referrer(self, email: str, password: str) -> dict[str, Any] | None: ...
-    def create_referral(self, user: dict[str, Any], answers: dict[str, Any], ref_number: str) -> dict[str, Any]: ...
+    def authenticate_referee(
+        self, ref_number: str, postcode: str
+    ) -> dict[str, Any] | None: ...
+    def authenticate_referrer(
+        self, email: str, password: str
+    ) -> dict[str, Any] | None: ...
+    def create_referral(
+        self, user: dict[str, Any], answers: dict[str, Any], ref_number: str
+    ) -> dict[str, Any]: ...
     def get_referral(self, ref_number: str) -> dict[str, Any] | None: ...
     def get_referrer_profile(self, user: dict[str, Any]) -> dict[str, Any]: ...
     def hydrate_referrer_user(self, user: dict[str, Any]) -> dict[str, Any] | None: ...
     def has_form_access(self, user: dict[str, Any], form_id: str) -> bool: ...
-    def list_referrals_for_referrer(self, user: dict[str, Any]) -> list[dict[str, Any]]: ...
-    def register_referrer(self, name: str, email: str, password: str) -> dict[str, Any]: ...
+    def list_referrals_for_referrer(
+        self, user: dict[str, Any]
+    ) -> list[dict[str, Any]]: ...
+    def register_referrer(
+        self, name: str, email: str, password: str
+    ) -> dict[str, Any]: ...
 
 
 def build_backend(config: dict[str, Any]) -> AppBackend:
@@ -92,7 +102,9 @@ class LocalBackend:
         self._ensure_referrer_defaults(email, referrer)
         return self._session_user(email, referrer)
 
-    def authenticate_referee(self, ref_number: str, postcode: str) -> dict[str, Any] | None:
+    def authenticate_referee(
+        self, ref_number: str, postcode: str
+    ) -> dict[str, Any] | None:
         referral = referees.get(ref_number)
         if not referral:
             return None
@@ -134,7 +146,9 @@ class LocalBackend:
         referral_ids = referrer.get("referrals", [])
         return [referees[ref] for ref in referral_ids if ref in referees]
 
-    def create_referral(self, user: dict[str, Any], answers: dict[str, Any], ref_number: str) -> dict[str, Any]:
+    def create_referral(
+        self, user: dict[str, Any], answers: dict[str, Any], ref_number: str
+    ) -> dict[str, Any]:
         created_at = _utc_now_iso()
         referral = {
             "answers": dict(answers),
@@ -163,7 +177,9 @@ class LocalBackend:
     def _ensure_referrer_defaults(self, email: str, referrer: dict[str, Any]) -> None:
         referrer.setdefault("form_access", {self.form_id})
         referrer.setdefault("referrals", [])
-        referrer.setdefault("sub", str(uuid.uuid5(uuid.NAMESPACE_URL, f"local-referrer:{email}")))
+        referrer.setdefault(
+            "sub", str(uuid.uuid5(uuid.NAMESPACE_URL, f"local-referrer:{email}"))
+        )
 
     def _session_user(self, email: str, referrer: dict[str, Any]) -> dict[str, Any]:
         return {
@@ -227,7 +243,9 @@ class AwsBackend:
                 raise DuplicateReferrerError from error
             if created_cognito_user:
                 with suppress(Exception):
-                    self.cognito_user.delete_user(userpool_id=self.user_pool_id, username=email)
+                    self.cognito_user.delete_user(
+                        userpool_id=self.user_pool_id, username=email
+                    )
             if error_code in {"InvalidParameterException", "InvalidPasswordException"}:
                 raise InvalidReferrerPasswordError(
                     error.response["Error"].get(
@@ -237,9 +255,13 @@ class AwsBackend:
                 ) from error
             raise
 
-        cognito_user = self.cognito_user.get_user_by_email(userpool_id=self.user_pool_id, email=email)
+        cognito_user = self.cognito_user.get_user_by_email(
+            userpool_id=self.user_pool_id, email=email
+        )
         if not cognito_user:
-            raise RuntimeError(f"Unable to load Cognito user after registration for {email}")
+            raise RuntimeError(
+                f"Unable to load Cognito user after registration for {email}"
+            )
         user_sub = self.cognito_user.get_attribute_from_user(cognito_user, "sub")
         if not user_sub:
             raise RuntimeError(f"Cognito user for {email} is missing sub")
@@ -288,11 +310,18 @@ class AwsBackend:
             )
         except ClientError as error:
             error_code = error.response["Error"]["Code"]
-            if error_code in {"NotAuthorizedException", "PasswordResetRequiredException", "UserNotConfirmedException", "UserNotFoundException"}:
+            if error_code in {
+                "NotAuthorizedException",
+                "PasswordResetRequiredException",
+                "UserNotConfirmedException",
+                "UserNotFoundException",
+            }:
                 return None
             raise
 
-        cognito_user = self.cognito_user.get_user_by_email(userpool_id=self.user_pool_id, email=email)
+        cognito_user = self.cognito_user.get_user_by_email(
+            userpool_id=self.user_pool_id, email=email
+        )
         if not cognito_user:
             return None
         user_sub = self.cognito_user.get_attribute_from_user(cognito_user, "sub")
@@ -307,7 +336,9 @@ class AwsBackend:
             "type": "referrer",
         }
 
-    def authenticate_referee(self, ref_number: str, postcode: str) -> dict[str, Any] | None:
+    def authenticate_referee(
+        self, ref_number: str, postcode: str
+    ) -> dict[str, Any] | None:
         referral = self.get_referral(ref_number)
         if not referral:
             return None
@@ -320,7 +351,9 @@ class AwsBackend:
         }
 
     def get_referrer_profile(self, user: dict[str, Any]) -> dict[str, Any]:
-        item = self.table.get_item(Key={"pk": self._user_pk(user["sub"]), "sk": "PROFILE"}).get("Item", {})
+        item = self.table.get_item(
+            Key={"pk": self._user_pk(user["sub"]), "sk": "PROFILE"}
+        ).get("Item", {})
         return {
             "email": item.get("email", user.get("email", "")),
             "name": item.get("name", user.get("name", user.get("email", ""))),
@@ -342,7 +375,9 @@ class AwsBackend:
         if not isinstance(email, str) or not email:
             return None
 
-        cognito_user = self.cognito_user.get_user_by_email(userpool_id=self.user_pool_id, email=email)
+        cognito_user = self.cognito_user.get_user_by_email(
+            userpool_id=self.user_pool_id, email=email
+        )
         if not cognito_user:
             return None
         resolved_sub = self.cognito_user.get_attribute_from_user(cognito_user, "sub")
@@ -367,12 +402,15 @@ class AwsBackend:
         from boto3.dynamodb.conditions import Key
 
         response = self.table.query(
-            KeyConditionExpression=Key("pk").eq(self._user_pk(user["sub"])) & Key("sk").begins_with("REFERRAL#")
+            KeyConditionExpression=Key("pk").eq(self._user_pk(user["sub"]))
+            & Key("sk").begins_with("REFERRAL#")
         )
         items = response.get("Items", [])
         return sorted(items, key=lambda item: item.get("created_at", ""), reverse=True)
 
-    def create_referral(self, user: dict[str, Any], answers: dict[str, Any], ref_number: str) -> dict[str, Any]:
+    def create_referral(
+        self, user: dict[str, Any], answers: dict[str, Any], ref_number: str
+    ) -> dict[str, Any]:
         referral = {
             "answers": dict(answers),
             "child_name": answers.get("child_name", ""),
@@ -401,7 +439,10 @@ class AwsBackend:
 
         response = self.table.query(
             IndexName="gsi1",
-            KeyConditionExpression=Key("gsi1pk").eq(self._referral_lookup_pk(ref_number)) & Key("gsi1sk").eq("REFERRAL"),
+            KeyConditionExpression=Key("gsi1pk").eq(
+                self._referral_lookup_pk(ref_number)
+            )
+            & Key("gsi1sk").eq("REFERRAL"),
             Limit=1,
         )
         items = response.get("Items", [])

@@ -7,7 +7,9 @@ from flask import current_app
 
 
 class RegistrationNotifier(Protocol):
-    def send_referrer_registration_email(self, email_address: str, name: str, sign_in_url: str) -> None: ...
+    def send_referrer_registration_email(
+        self, email_address: str, name: str, sign_in_url: str
+    ) -> None: ...
 
 
 def build_notifier(config: dict[str, Any]) -> RegistrationNotifier:
@@ -20,7 +22,9 @@ def build_notifier(config: dict[str, Any]) -> RegistrationNotifier:
     return NotifyNotifier(
         aws_region=config.get("AWS_REGION", "eu-west-2"),
         notify_api_key_secret_name=secret_name,
-        service_name=config.get("SERVICE_NAME", "Request for Children's Centre Service"),
+        service_name=config.get(
+            "SERVICE_NAME", "Request for Children's Centre Service"
+        ),
         template_id=template_id,
     )
 
@@ -30,7 +34,9 @@ def get_notifier() -> RegistrationNotifier:
 
 
 class NullNotifier:
-    def send_referrer_registration_email(self, email_address: str, name: str, sign_in_url: str) -> None:
+    def send_referrer_registration_email(
+        self, email_address: str, name: str, sign_in_url: str
+    ) -> None:
         return None
 
 
@@ -52,7 +58,9 @@ class NotifyNotifier:
         self.template_id = template_id
         self._api_key: str | None = None
 
-    def send_referrer_registration_email(self, email_address: str, name: str, sign_in_url: str) -> None:
+    def send_referrer_registration_email(
+        self, email_address: str, name: str, sign_in_url: str
+    ) -> None:
         client = self.notification_client_cls(api_key=self._get_api_key())
         client.send_email_notification(
             email_address=email_address,
@@ -68,7 +76,9 @@ class NotifyNotifier:
         if self._api_key:
             return self._api_key
 
-        response = self.secretsmanager.get_secret_value(SecretId=self.notify_api_key_secret_name)
+        response = self.secretsmanager.get_secret_value(
+            SecretId=self.notify_api_key_secret_name
+        )
         secret_string = response.get("SecretString")
         if not secret_string:
             raise RuntimeError("Notify API key secret has no SecretString")
