@@ -80,10 +80,14 @@
       <span class="govuk-visually-hidden">Error:</span> {{ errors.gender }}
     </p>
     {% endif %}
-    <input class="govuk-input govuk-input--width-one-half {% if errors.gender %}govuk-input--error{% endif %}"
-           id="gender" name="gender" type="text" autocomplete="off"
-           aria-describedby="{% if errors.gender %}gender-error{% endif %}"
-           value="{{ answers.gender or '' }}">
+    <select class="govuk-select {% if errors.gender %}govuk-select--error{% endif %}"
+           id="gender" name="gender" aria-describedby="{% if errors.gender %}gender-error{% endif %}">
+      <option value="">Select a gender</option>
+      <option value="Male" {% if answers.gender == 'Male' %}selected{% endif %}>Male</option>
+      <option value="Female" {% if answers.gender == 'Female' %}selected{% endif %}>Female</option>
+      <option value="Non-binary" {% if answers.gender == 'Non-binary' %}selected{% endif %}>Non-binary</option>
+      <option value="Prefer not to say" {% if answers.gender == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+    </select>
   </div>
 
   <button class="govuk-button" data-module="govuk-button">Continue</button>
