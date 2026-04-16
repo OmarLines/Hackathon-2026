@@ -22,3 +22,13 @@ output "cognito_user_pool_id" {
   description = "ID of the Cognito user pool."
   value       = module.cognito_user_pool.user_pool_id
 }
+
+output "notify_api_key_secret_arn" {
+  description = "ARN of the GOV Notify API key secret."
+  value       = aws_secretsmanager_secret.notify_api_key.arn
+}
+
+output "notify_api_key_secret_name" {
+  description = "Name of the GOV Notify API key secret."
+  value       = aws_secretsmanager_secret.notify_api_key.name
+}

@@ -38,3 +38,15 @@ variable "user_pool_name" {
   type        = string
   default     = "hackathon-2026-app-users"
 }
+
+variable "notify_api_key_secret_description" {
+  description = "Description for the GOV Notify API key secret."
+  type        = string
+  default     = "GOV Notify API key for Hackathon 2026 referrer account emails."
+}
+
+variable "notify_api_key_secret_name" {
+  description = "Secrets Manager name for the GOV Notify API key."
+  type        = string
+  default     = "hackathon-2026-notify_api_key"
+}
