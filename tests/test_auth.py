@@ -51,6 +51,23 @@ def test_login_page(client):
     assert "Sign in" in response.get_data(as_text=True)
 
 
+def test_referrer_login_failure_message(client):
+    response = client.post(
+        "/login",
+        data={
+            "user_type": "referrer",
+            "email": "test@example.com",
+            "password": "wrong-password",
+        },
+    )
+
+    assert response.status_code == 200
+    assert (
+        "Either your username and password are incorrect, "
+        "or you are not registered with this service."
+    ) in response.get_data(as_text=True)
+
+
 def test_logout(client):
     with client.session_transaction() as sess:
         sess["user"] = {"type": "referrer", "email": "test@example.com", "name": "Test"}

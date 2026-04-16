@@ -147,7 +147,10 @@ def login():
             if user:
                 session["user"] = user
                 return redirect(url_for("auth.dashboard"))
-            errors["referrer_login"] = "Incorrect email address or password"
+            errors["referrer_login"] = (
+                "Either your username and password are incorrect, "
+                "or you are not registered with this service."
+            )
 
         elif user_type == "referee":
             ref_number = request.form.get("ref_number", "").strip().upper()

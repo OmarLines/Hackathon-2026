@@ -16,6 +16,12 @@ variable "table_name" {
   default     = "hackathon-2026-app-data"
 }
 
+variable "referrer_details_table_name" {
+  description = "Name of the DynamoDB table for saved referrer step defaults."
+  type        = string
+  default     = "hackathon-2026-referrer-details"
+}
+
 variable "tags" {
   description = "Additional tags to apply to shared infrastructure."
   type        = map(string)

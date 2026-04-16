@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from .aws_cognito import get_cognito_idp_client
 from .cognito_user import CognitoUser
-from .store import referees, referrers
+from .store import referees, referrer_details, referrers
 
 
 class DuplicateReferrerError(RuntimeError):
@@ -37,6 +37,7 @@ class AppBackend(Protocol):
     ) -> dict[str, Any]: ...
     def get_referral(self, ref_number: str) -> dict[str, Any] | None: ...
     def get_referrer_profile(self, user: dict[str, Any]) -> dict[str, Any]: ...
+    def get_saved_referrer_details(self, user: dict[str, Any]) -> dict[str, str]: ...
     def hydrate_referrer_user(self, user: dict[str, Any]) -> dict[str, Any] | None: ...
     def has_form_access(self, user: dict[str, Any], form_id: str) -> bool: ...
     def list_referrals_for_referrer(
@@ -45,6 +46,9 @@ class AppBackend(Protocol):
     def register_referrer(
         self, name: str, email: str, password: str
     ) -> dict[str, Any]: ...
+    def save_referrer_details(
+        self, user: dict[str, Any], referrer_name: str, role_agency: str
+    ) -> None: ...
 
 
 def build_backend(config: dict[str, Any]) -> AppBackend:
@@ -57,6 +61,7 @@ def build_backend(config: dict[str, Any]) -> AppBackend:
         return AwsBackend(
             aws_region=config.get("AWS_REGION", "eu-west-2"),
             form_id=form_id,
+            referrer_details_table_name=config.get("REFERRER_DETAILS_TABLE_NAME"),
             referrals_table_name=config.get("REFERRALS_TABLE_NAME"),
             user_pool_client_id=config.get("COGNITO_USER_POOL_CLIENT_ID"),
             user_pool_id=config.get("COGNITO_USER_POOL_ID"),
@@ -124,6 +129,16 @@ class LocalBackend:
             "sub": referrer.get("sub", user.get("sub")),
         }
 
+    def get_saved_referrer_details(self, user: dict[str, Any]) -> dict[str, str]:
+        user_sub = user.get("sub")
+        if not isinstance(user_sub, str) or not user_sub:
+            return {}
+        item = referrer_details.get(user_sub, {})
+        return {
+            "referrer_name": str(item.get("referrer_name", "")),
+            "role_agency": str(item.get("role_agency", "")),
+        }
+
     def hydrate_referrer_user(self, user: dict[str, Any]) -> dict[str, Any] | None:
         email = user.get("email")
         if not isinstance(email, str) or not email:
@@ -145,6 +160,17 @@ class LocalBackend:
         referrer = referrers.get(user["email"], {})
         referral_ids = referrer.get("referrals", [])
         return [referees[ref] for ref in referral_ids if ref in referees]
+
+    def save_referrer_details(
+        self, user: dict[str, Any], referrer_name: str, role_agency: str
+    ) -> None:
+        user_sub = user.get("sub")
+        if not isinstance(user_sub, str) or not user_sub:
+            return
+        referrer_details[user_sub] = {
+            "referrer_name": referrer_name,
+            "role_agency": role_agency,
+        }
 
     def create_referral(
         self, user: dict[str, Any], answers: dict[str, Any], ref_number: str
@@ -195,6 +221,7 @@ class AwsBackend:
         self,
         aws_region: str,
         form_id: str,
+        referrer_details_table_name: str | None,
         referrals_table_name: str | None,
         user_pool_client_id: str | None,
         user_pool_id: str | None,
@@ -202,6 +229,7 @@ class AwsBackend:
         missing = {
             "COGNITO_USER_POOL_CLIENT_ID": user_pool_client_id,
             "COGNITO_USER_POOL_ID": user_pool_id,
+            "REFERRER_DETAILS_TABLE_NAME": referrer_details_table_name,
             "REFERRALS_TABLE_NAME": referrals_table_name,
         }
         missing_keys = [name for name, value in missing.items() if not value]
@@ -219,7 +247,10 @@ class AwsBackend:
         self.cognito = get_cognito_idp_client(aws_region)
         self.cognito_user = CognitoUser(client=self.cognito)
         self.dynamodb = boto3.resource("dynamodb", region_name=aws_region)
-        self.table = self.dynamodb.Table(referrals_table_name or "")
+        self.referrals_table = self.dynamodb.Table(referrals_table_name or "")
+        self.referrer_details_table = self.dynamodb.Table(
+            referrer_details_table_name or ""
+        )
 
     def register_referrer(self, name: str, email: str, password: str) -> dict[str, Any]:
         from botocore.exceptions import ClientError
@@ -267,7 +298,7 @@ class AwsBackend:
             raise RuntimeError(f"Cognito user for {email} is missing sub")
 
         created_at = _utc_now_iso()
-        self.table.put_item(
+        self.referrals_table.put_item(
             Item={
                 "created_at": created_at,
                 "email": email,
@@ -279,7 +310,7 @@ class AwsBackend:
             },
             ConditionExpression="attribute_not_exists(pk) AND attribute_not_exists(sk)",
         )
-        self.table.put_item(
+        self.referrals_table.put_item(
             Item={
                 "access_level": "referrer",
                 "created_at": created_at,
@@ -351,13 +382,22 @@ class AwsBackend:
         }
 
     def get_referrer_profile(self, user: dict[str, Any]) -> dict[str, Any]:
-        item = self.table.get_item(
+        item = self.referrals_table.get_item(
             Key={"pk": self._user_pk(user["sub"]), "sk": "PROFILE"}
         ).get("Item", {})
         return {
             "email": item.get("email", user.get("email", "")),
             "name": item.get("name", user.get("name", user.get("email", ""))),
             "sub": user["sub"],
+        }
+
+    def get_saved_referrer_details(self, user: dict[str, Any]) -> dict[str, str]:
+        item = self.referrer_details_table.get_item(
+            Key={"user_id": user["sub"]}
+        ).get("Item", {})
+        return {
+            "referrer_name": str(item.get("referrer_name", "")),
+            "role_agency": str(item.get("role_agency", "")),
         }
 
     def hydrate_referrer_user(self, user: dict[str, Any]) -> dict[str, Any] | None:
@@ -393,7 +433,7 @@ class AwsBackend:
         }
 
     def has_form_access(self, user: dict[str, Any], form_id: str) -> bool:
-        item = self.table.get_item(
+        item = self.referrals_table.get_item(
             Key={"pk": self._user_pk(user["sub"]), "sk": self._form_access_sk(form_id)}
         ).get("Item")
         return item is not None
@@ -401,12 +441,36 @@ class AwsBackend:
     def list_referrals_for_referrer(self, user: dict[str, Any]) -> list[dict[str, Any]]:
         from boto3.dynamodb.conditions import Key
 
-        response = self.table.query(
+        response = self.referrals_table.query(
             KeyConditionExpression=Key("pk").eq(self._user_pk(user["sub"]))
             & Key("sk").begins_with("REFERRAL#")
         )
         items = response.get("Items", [])
         return sorted(items, key=lambda item: item.get("created_at", ""), reverse=True)
+
+    def save_referrer_details(
+        self, user: dict[str, Any], referrer_name: str, role_agency: str
+    ) -> None:
+        now = _utc_now_iso()
+        self.referrer_details_table.update_item(
+            Key={"user_id": user["sub"]},
+            UpdateExpression=(
+                "SET created_at = if_not_exists(created_at, :created_at), "
+                "email = :email, "
+                "entity_type = :entity_type, "
+                "referrer_name = :referrer_name, "
+                "role_agency = :role_agency, "
+                "updated_at = :updated_at"
+            ),
+            ExpressionAttributeValues={
+                ":created_at": now,
+                ":email": user["email"],
+                ":entity_type": "REFERRER_DETAILS",
+                ":referrer_name": referrer_name,
+                ":role_agency": role_agency,
+                ":updated_at": now,
+            },
+        )
 
     def create_referral(
         self, user: dict[str, Any], answers: dict[str, Any], ref_number: str
@@ -428,7 +492,7 @@ class AwsBackend:
             "sk": self._referral_sk(ref_number),
             "user_id": user["sub"],
         }
-        self.table.put_item(
+        self.referrals_table.put_item(
             Item=referral,
             ConditionExpression="attribute_not_exists(pk) AND attribute_not_exists(sk)",
         )
@@ -437,7 +501,7 @@ class AwsBackend:
     def get_referral(self, ref_number: str) -> dict[str, Any] | None:
         from boto3.dynamodb.conditions import Key
 
-        response = self.table.query(
+        response = self.referrals_table.query(
             IndexName="gsi1",
             KeyConditionExpression=Key("gsi1pk").eq(
                 self._referral_lookup_pk(ref_number)
