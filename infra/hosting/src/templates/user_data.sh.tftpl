@@ -19,7 +19,7 @@ NGINX_SERVER_NAME="${nginx_server_name}"
 UV_BIN="${app_install_path}/.local/bin/uv"
 
 dnf update -y
-dnf install -y amazon-cloudwatch-agent curl git nginx
+dnf install -y amazon-cloudwatch-agent git nginx
 
 if ! id "$${APP_USER}" >/dev/null 2>&1; then
   useradd --system --create-home --home-dir "${app_install_path}" --shell /bin/bash "$${APP_USER}"
