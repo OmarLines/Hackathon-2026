@@ -8,6 +8,9 @@ dependencies = [
     "notifications-python-client>=9.0.0",
 ]
 
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
 [tool.uv]
 dev-dependencies = [
     "pytest>=9.0.3",

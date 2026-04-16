@@ -73,14 +73,12 @@ def validate_child(data: dict[str, str]) -> dict[str, str]:
     errors: dict[str, str] = {}
     if not data.get("child_name", "").strip():
         errors["child_name"] = "Enter the child's name"
-    day: str = data.get("child_dob_day", "")
-    month: str = data.get("child_dob_month", "")
-    year: str = data.get("child_dob_year", "")
-    if not day or not month or not year:
+    dob_str: str = data.get("child_dob", "")
+    if not dob_str:
         errors["child_dob"] = "Enter the child's date of birth"
     else:
         try:
-            dob: date = date(int(year), int(month), int(day))
+            dob: date = date.fromisoformat(dob_str)
             if dob > date.today():
                 errors["child_dob"] = "Date of birth must be in the past"
         except ValueError:
@@ -118,24 +116,23 @@ def validate_parent(data: dict[str, str]) -> dict[str, str]:
         errors["parent_name"] = "Enter the parent or carer's name"
 
     email: str = data.get("parent_email", "").strip()
-    if email and not re.match(
+    if not email:
+        errors["parent_email"] = "Enter the parent or carer's email address"
+    elif not re.match(
         r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email
     ):
         errors["parent_email"] = "Enter a real email address"
 
-    day: str = data.get("parent_dob_day", "").strip()
-    month: str = data.get("parent_dob_month", "").strip()
-    year: str = data.get("parent_dob_year", "").strip()
-    if day or month or year:
-        if not day or not month or not year:
-            errors["parent_dob"] = "Enter the parent's full date of birth"
-        else:
-            try:
-                dob: date = date(int(year), int(month), int(day))
-                if dob > date.today():
-                    errors["parent_dob"] = "Date of birth must be in the past"
-            except ValueError:
-                errors["parent_dob"] = "Enter a real date of birth"
+    dob_str: str = data.get("parent_dob", "").strip()
+    if not dob_str:
+        errors["parent_dob"] = "Enter the parent or carer's date of birth"
+    else:
+        try:
+            dob: date = date.fromisoformat(dob_str)
+            if dob > date.today():
+                errors["parent_dob"] = "Date of birth must be in the past"
+        except ValueError:
+            errors["parent_dob"] = "Enter a real date of birth"
 
     family_tel: str = data.get("family_tel", "").strip()
     if family_tel and not re.match(r"^[0-9\s\+\-\(\)]{7,20}$", family_tel):
@@ -152,14 +149,12 @@ def validate_referrer(data: dict[str, str]) -> dict[str, str]:
         errors["referrer_name"] = "Enter the referrer's name"
     if not data.get("role_agency", "").strip():
         errors["role_agency"] = "Enter the role or agency"
-    day: str = data.get("referral_date_day", "").strip()
-    month: str = data.get("referral_date_month", "").strip()
-    year: str = data.get("referral_date_year", "").strip()
-    if not day or not month or not year:
+    referral_date_str: str = data.get("referral_date", "").strip()
+    if not referral_date_str:
         errors["referral_date"] = "Enter the date of referral"
     else:
         try:
-            ref_date: date = date(int(year), int(month), int(day))
+            ref_date: date = date.fromisoformat(referral_date_str)
             if ref_date > date.today():
                 errors["referral_date"] = "Date of referral must be in the past"
         except ValueError:
@@ -203,30 +198,16 @@ VALIDATORS: dict[str, Callable[[dict[str, str]], dict[str, str]]] = {
 }
 
 FORM_FIELDS: dict[str, list[str]] = {
-    "child": [
-        "child_name",
-        "child_dob_day",
-        "child_dob_month",
-        "child_dob_year",
-        "gender",
-    ],
+    "child": ["child_name", "child_dob", "gender"],
     "address": ["address_line1", "address_line2", "town", "postcode", "tel_no"],
     "parent": [
         "parent_name",
         "parent_email",
-        "parent_dob_day",
-        "parent_dob_month",
-        "parent_dob_year",
+        "parent_dob",
         "family_tel",
         "locality",
     ],
-    "referrer": [
-        "referrer_name",
-        "role_agency",
-        "referral_date_day",
-        "referral_date_month",
-        "referral_date_year",
-    ],
+    "referrer": ["referrer_name", "role_agency", "referral_date"],
     "service_type": ["service_type"],
     "service_selection": ["service"],
     "additional_info": ["additional_info"],
