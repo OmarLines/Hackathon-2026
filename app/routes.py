@@ -28,6 +28,11 @@ def next_step(current):
     return STEPS[idx + 1] if idx + 1 < len(STEPS) else None
 
 
+def prev_step(current):
+    idx = STEPS.index(current)
+    return STEPS[idx - 1] if idx > 0 else None
+
+
 def validate_child(data):
     errors = {}
     if not data.get("child_name", "").strip():
@@ -204,6 +209,8 @@ def step(step_name):
         extra["service_options"] = SERVICE_OPTIONS.get(service_type, [])
         extra["service_type_label"] = "Prevention" if service_type == "prevention" else "Intervention"
 
+    extra["prev_step"] = prev_step(step_name)
+
     return render_template(f"steps/{step_name}.html", answers=answers, errors=errors, **extra)
 
 
@@ -232,7 +239,8 @@ def check():
             referrer["referrals"].append(ref)
 
         return redirect(url_for("main.confirmation"))
-    return render_template("steps/check.html", answers=answers, service_labels=SERVICE_LABELS)
+
+    return render_template("steps/check.html", answers=answers, service_labels=SERVICE_LABELS, prev_step="consent")
 
 
 @bp.route("/apply/confirmation")
