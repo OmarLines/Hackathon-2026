@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Admin dashboard{% endblock %}
+{% block content %}
+
+<h1 class="govuk-heading-l">Admin dashboard</h1>
+
+<h2 class="govuk-heading-m">Referrers ({{ referrers | length }})</h2>
+
+{% if referrers %}
+<table class="govuk-table govuk-!-margin-bottom-9">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header">Name</th>
+      <th class="govuk-table__header">Email</th>
+      <th class="govuk-table__header">Referrals submitted</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for r in referrers %}
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">{{ r.name or '—' }}</td>
+      <td class="govuk-table__cell">{{ r.email }}</td>
+      <td class="govuk-table__cell">{{ r.referral_count if r.referral_count is not none else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="govuk-body">No referrers registered yet.</p>
+{% endif %}
+
+<h2 class="govuk-heading-m">All referrals ({{ referrals | length }})</h2>
+
+{% if referrals %}
+<table class="govuk-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header">Reference</th>
+      <th class="govuk-table__header">Child's name</th>
+      <th class="govuk-table__header">Service</th>
+      <th class="govuk-table__header">Referrer</th>
+      <th class="govuk-table__header">Status</th>
+      <th class="govuk-table__header">Date</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for r in referrals %}
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell"><strong>{{ r.ref_number }}</strong></td>
+      <td class="govuk-table__cell">{{ r.child_name }}</td>
+      <td class="govuk-table__cell">{{ service_labels.get(r.answers.service, r.answers.get('service', '—')) }}</td>
+      <td class="govuk-table__cell">{{ r.referrer_name or r.referrer_email or '—' }}</td>
+      <td class="govuk-table__cell">
+        <strong class="govuk-tag {% if r.status == 'accepted' %}govuk-tag--green{% elif r.status == 'sent' %}govuk-tag--blue{% else %}govuk-tag--grey{% endif %}">
+          {{ r.status | capitalize }}
+        </strong>
+      </td>
+      <td class="govuk-table__cell govuk-!-font-size-16">{{ r.created_at[:10] if r.created_at else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="govuk-body">No referrals submitted yet.</p>
+{% endif %}
+
+<p class="govuk-body govuk-!-margin-top-6">
+  <a href="{{ url_for('auth.logout') }}" class="govuk-link">Sign out</a>
+</p>
+
+{% endblock %}
