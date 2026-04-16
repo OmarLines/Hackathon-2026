@@ -260,19 +260,23 @@ def step(step_name):
         return redirect(url_for("main.step", step_name="service_type"))
 
     if request.method == "POST":
-        form_data = request.form.to_dict()
+        form_data: dict[str, str] = request.form.to_dict()
         if step_name == "consent":
             form_data["registered_sure_start"] = form_data.get(
                 "registered_sure_start", ""
             )
 
-        validator = VALIDATORS.get(step_name)
+        # Temporarily update answers with submitted data so it persists on error
+        for field in FORM_FIELDS.get(step_name, []):
+            answers[field] = form_data.get(field, "")
+
+        validator: Callable[[dict[str, str]], dict[str, str]] | None = VALIDATORS.get(
+            step_name
+        )
         if validator:
             errors = validator(form_data)
 
         if not errors:
-            for field in FORM_FIELDS.get(step_name, []):
-                answers[field] = form_data.get(field, "")
             session["answers"] = answers
             return redirect(url_for("main.step", step_name=next_step(step_name)))
 
