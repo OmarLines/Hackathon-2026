@@ -9,6 +9,9 @@ Test admin username: `admin`
 
 Test admin password: `admin`
 
+You cna also sign up for a new account to test it.
+
+
 ## The Problem: Paper-Based Friction
 Early years professionals and healthcare staff (such as midwives or nursery workers) currently navigate a heavily manual, paper-based workflow to refer families to Family Hubs. The existing 4-page PDF ("Request for Children's Centre Service") creates significant administrative friction:
 - **No Visibility:** Neither the referrer nor the family can track the progress of a referral once sent.
