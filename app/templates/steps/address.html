@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}What is your address?{% endblock %}
+{% block content %}
+<form method="post" novalidate>
+  {% if errors %}
+  <div class="govuk-error-summary" data-module="govuk-error-summary">
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">There is a problem</h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          {% for field, msg in errors.items() %}
+          <li><a href="#{{ field }}">{{ msg }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">What is your address?</h1>
+
+  <div class="govuk-form-group {% if errors.address_line1 %}govuk-form-group--error{% endif %}">
+    <label class="govuk-label" for="address_line1">Address line 1</label>
+    {% if errors.address_line1 %}
+    <p id="address_line1-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.address_line1 }}
+    </p>
+    {% endif %}
+    <input class="govuk-input {% if errors.address_line1 %}govuk-input--error{% endif %}"
+           id="address_line1" name="address_line1" type="text" autocomplete="address-line1"
+           aria-describedby="{% if errors.address_line1 %}address_line1-error{% endif %}"
+           value="{{ answers.address_line1 or '' }}">
+  </div>
+
+  <div class="govuk-form-group">
+    <label class="govuk-label" for="address_line2">Address line 2 (optional)</label>
+    <input class="govuk-input" id="address_line2" name="address_line2" type="text"
+           autocomplete="address-line2" value="{{ answers.address_line2 or '' }}">
+  </div>
+
+  <div class="govuk-form-group">
+    <label class="govuk-label" for="address_line3">Address line 3 (optional)</label>
+    <input class="govuk-input" id="address_line3" name="address_line3" type="text"
+           value="{{ answers.address_line3 or '' }}">
+  </div>
+
+  <div class="govuk-form-group {% if errors.town %}govuk-form-group--error{% endif %}">
+    <label class="govuk-label" for="town">Town or city</label>
+    {% if errors.town %}
+    <p id="town-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.town }}
+    </p>
+    {% endif %}
+    <input class="govuk-input govuk-input--width-two-thirds {% if errors.town %}govuk-input--error{% endif %}"
+           id="town" name="town" type="text" autocomplete="address-level2"
+           aria-describedby="{% if errors.town %}town-error{% endif %}"
+           value="{{ answers.town or '' }}">
+  </div>
+
+  <div class="govuk-form-group {% if errors.postcode %}govuk-form-group--error{% endif %}">
+    <label class="govuk-label" for="postcode">Postcode</label>
+    {% if errors.postcode %}
+    <p id="postcode-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.postcode }}
+    </p>
+    {% endif %}
+    <input class="govuk-input govuk-input--width-10 {% if errors.postcode %}govuk-input--error{% endif %}"
+           id="postcode" name="postcode" type="text" autocomplete="postal-code"
+           aria-describedby="{% if errors.postcode %}postcode-error{% endif %}"
+           value="{{ answers.postcode or '' }}">
+  </div>
+
+  <button class="govuk-button" data-module="govuk-button">Continue</button>
+</form>
+{% endblock %}

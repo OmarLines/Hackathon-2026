@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Check your answers{% endblock %}
+{% block content %}
+<h1 class="govuk-heading-l">Check your answers before sending your application</h1>
+
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Full name</dt>
+    <dd class="govuk-summary-list__value">{{ answers.full_name }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='name') }}">Change<span class="govuk-visually-hidden"> full name</span></a>
+    </dd>
+  </div>
+
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Date of birth</dt>
+    <dd class="govuk-summary-list__value">{{ answers.dob_day }}/{{ answers.dob_month }}/{{ answers.dob_year }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='dob') }}">Change<span class="govuk-visually-hidden"> date of birth</span></a>
+    </dd>
+  </div>
+
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Address</dt>
+    <dd class="govuk-summary-list__value">
+      {{ answers.address_line1 }}<br>
+      {% if answers.address_line2 %}{{ answers.address_line2 }}<br>{% endif %}
+      {% if answers.address_line3 %}{{ answers.address_line3 }}<br>{% endif %}
+      {{ answers.town }}<br>
+      {{ answers.postcode }}
+    </dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='address') }}">Change<span class="govuk-visually-hidden"> address</span></a>
+    </dd>
+  </div>
+
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Licence type</dt>
+    <dd class="govuk-summary-list__value">{{ answers.licence_type | capitalize }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='licence_type') }}">Change<span class="govuk-visually-hidden"> licence type</span></a>
+    </dd>
+  </div>
+
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Previous licence number</dt>
+    <dd class="govuk-summary-list__value">{{ answers.previous_licence_number or 'Not provided' }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='previous_licence') }}">Change<span class="govuk-visually-hidden"> previous licence number</span></a>
+    </dd>
+  </div>
+
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Declaration</dt>
+    <dd class="govuk-summary-list__value">Agreed</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='declaration') }}">Change<span class="govuk-visually-hidden"> declaration</span></a>
+    </dd>
+  </div>
+
+</dl>
+
+<h2 class="govuk-heading-m">Now send your application</h2>
+<p class="govuk-body">By submitting this application you confirm that the information is correct.</p>
+
+<form method="post">
+  <button class="govuk-button" data-module="govuk-button">Accept and send</button>
+</form>
+{% endblock %}
