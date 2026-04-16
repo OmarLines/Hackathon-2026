@@ -31,7 +31,9 @@
             <strong>{{ r.ref_number }}</strong>
           </td>
           <td class="govuk-table__cell">{{ r.child_name }}</td>
-          <td class="govuk-table__cell">{{ r.answers.service or '—' }}</td>
+          <td class="govuk-table__cell">
+            {{ service_labels.get(r.answers.service, r.answers.service) or '—' }}
+          </td>
           <td class="govuk-table__cell">
             {% if r.status == 'accepted' %}
               <strong class="govuk-tag govuk-tag--green">Accepted</strong>

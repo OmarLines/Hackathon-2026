@@ -18,6 +18,7 @@ from .backend import (
     get_backend,
 )
 from .notifications import get_notifier
+from .routes import SERVICE_LABELS
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -208,8 +209,16 @@ def dashboard() -> Response | str:
         user = {**hydrated_user, "name": profile["name"]}
         submitted = get_backend().list_referrals_for_referrer(hydrated_user)
         return render_template(
-            "dashboard_referrer.html", user=user, referrals=submitted
+            "dashboard_referrer.html",
+            user=user,
+            referrals=submitted,
+            service_labels=SERVICE_LABELS,
         )
 
     referee = get_backend().get_referral(user["ref_number"]) or {}
-    return render_template("dashboard_referee.html", user=user, referral=referee)
+    return render_template(
+        "dashboard_referee.html",
+        user=user,
+        referral=referee,
+        service_labels=SERVICE_LABELS,
+    )

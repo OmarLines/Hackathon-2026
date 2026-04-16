@@ -35,7 +35,9 @@
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Service</dt>
-        <dd class="govuk-summary-list__value">{{ referral.answers.service }}</dd>
+        <dd class="govuk-summary-list__value">
+          {{ service_labels.get(referral.answers.service, referral.answers.service) }}
+        </dd>
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Status</dt>
