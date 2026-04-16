@@ -66,23 +66,29 @@ Uses the shared S3 backend bucket `hackathon-state-ctrl-atl-defeat`.
 
 ```powershell
 $env:AWS_PROFILE='co-hackathon'
+
 terraform -chdir=infra/cognito/src init
 terraform -chdir=infra/cognito/src plan -out=tfplan
 terraform -chdir=infra/cognito/src apply tfplan
-```
 
-```powershell
-$env:AWS_PROFILE='co-hackathon'
 terraform -chdir=infra/dynamodb/src init
 terraform -chdir=infra/dynamodb/src plan -out=tfplan
 terraform -chdir=infra/dynamodb/src apply tfplan
-```
 
-```powershell
-$env:AWS_PROFILE='co-hackathon'
 terraform -chdir=infra/hosting/src init
 terraform -chdir=infra/hosting/src plan -out=tfplan
 terraform -chdir=infra/hosting/src apply tfplan
 ```
 
 Hosting clones the app from GitHub `main` onto the EC2 instance.
+
+## Force app deploy
+
+Use this when app code has changed on GitHub `main` and you need to rebuild the EC2 instance so it pulls the latest version.
+
+```powershell
+$env:AWS_PROFILE='co-hackathon'
+terraform -chdir=infra/hosting/src init
+terraform -chdir=infra/hosting/src plan -out=tfplan '-replace=aws_instance.app'
+terraform -chdir=infra/hosting/src apply tfplan
+```
