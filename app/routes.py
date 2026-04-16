@@ -118,9 +118,7 @@ def validate_parent(data: dict[str, str]) -> dict[str, str]:
     email: str = data.get("parent_email", "").strip()
     if not email:
         errors["parent_email"] = "Enter the parent or carer's email address"
-    elif not re.match(
-        r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email
-    ):
+    elif not re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
         errors["parent_email"] = "Enter a real email address"
 
     dob_str: str = data.get("parent_dob", "").strip()
