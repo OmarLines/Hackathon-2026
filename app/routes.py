@@ -2,6 +2,7 @@ import uuid
 from datetime import date
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from .store import referrers, referees
+from .notify import send_referee_credentials
 
 bp = Blueprint("main", __name__)
 
@@ -277,6 +278,13 @@ def check():
         referrer = referrers.get(session["user"]["email"])
         if referrer is not None:
             referrer["referrals"].append(ref)
+
+        # Email the referee their login credentials via GOV.UK Notify
+        send_referee_credentials(
+            to_email=answers.get("parent_email", ""),
+            ref_number=ref,
+            postcode=answers.get("postcode", ""),
+        )
 
         return redirect(url_for("main.confirmation"))
 
