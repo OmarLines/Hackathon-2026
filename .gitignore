@@ -9,3 +9,5 @@ infra/**/*.tfstate
 infra/**/*.tfstate.*
 infra/**/crash.log
 *.pyc
+__pycache__/
+.DS_Store
