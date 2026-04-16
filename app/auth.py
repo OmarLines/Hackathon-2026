@@ -1,3 +1,5 @@
+import re
+
 from flask import (
     Blueprint,
     current_app,
@@ -8,7 +10,12 @@ from flask import (
     url_for,
 )
 
-from .backend import DuplicateReferrerError, InvalidReferrerPasswordError, get_backend
+from .backend import (
+    DuplicateReferrerError,
+    InvalidReferrerEmailError,
+    InvalidReferrerPasswordError,
+    get_backend,
+)
 from .notifications import get_notifier
 
 auth_bp = Blueprint("auth", __name__)
@@ -69,6 +76,12 @@ def _password_error(config: dict[str, object]) -> str:
     return "Password " + _build_password_hint(config).replace("Must", "must", 1)
 
 
+def _email_is_valid(email: str) -> bool:
+    return bool(
+        re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email)
+    )
+
+
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if session.get("user"):
@@ -87,6 +100,8 @@ def register():
             errors["name"] = "Enter your full name"
         if not email:
             errors["email"] = "Enter your email address"
+        elif not _email_is_valid(email):
+            errors["email"] = "Enter a real email address"
         if not password:
             errors["password"] = "Enter a password"
         elif not _password_meets_policy(password, current_app.config):
@@ -116,6 +131,8 @@ def register():
                 return redirect(url_for("auth.dashboard"))
             except DuplicateReferrerError:
                 errors["email"] = "An account with this email address already exists"
+            except InvalidReferrerEmailError:
+                errors["email"] = "Enter a real email address"
             except InvalidReferrerPasswordError:
                 errors["password"] = _password_error(current_app.config)
 

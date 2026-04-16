@@ -25,6 +25,10 @@ class InvalidReferrerPasswordError(RuntimeError):
     pass
 
 
+class InvalidReferrerEmailError(RuntimeError):
+    pass
+
+
 class AppBackend(Protocol):
     def authenticate_referee(
         self, ref_number: str, postcode: str
@@ -239,6 +243,7 @@ class AwsBackend:
             )
         except ClientError as error:
             error_code = error.response["Error"]["Code"]
+            error_message = error.response["Error"].get("Message", "")
             if error_code in {"AliasExistsException", "UsernameExistsException"}:
                 raise DuplicateReferrerError from error
             if created_cognito_user:
@@ -246,13 +251,18 @@ class AwsBackend:
                     self.cognito_user.delete_user(
                         userpool_id=self.user_pool_id, username=email
                     )
-            if error_code in {"InvalidParameterException", "InvalidPasswordException"}:
+            if error_code == "InvalidPasswordException":
                 raise InvalidReferrerPasswordError(
-                    error.response["Error"].get(
-                        "Message",
-                        "Password does not meet the required policy",
-                    )
+                    error_message or "Password does not meet the required policy"
                 ) from error
+            if error_code == "InvalidParameterException":
+                lowered_message = error_message.lower()
+                if "username should be an email" in lowered_message:
+                    raise InvalidReferrerEmailError(error_message) from error
+                if "password" in lowered_message:
+                    raise InvalidReferrerPasswordError(
+                        error_message or "Password does not meet the required policy"
+                    ) from error
             raise
 
         cognito_user = self.cognito_user.get_user_by_email(
