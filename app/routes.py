@@ -158,12 +158,13 @@ def validate_service_selection(data):
 
 def validate_consent(data):
     errors = {}
-    if not data.get("registered_sure_start"):
-        errors["registered_sure_start"] = (
-            "Confirm the family is registered with Sure Start Children's Centre"
+    registered = data.get("registered_sure_start") == "yes"
+    verbal = data.get("verbal_consent") == "yes"
+
+    if not registered and not verbal:
+        errors["verbal_consent"] = (
+            "Confirm the family is registered with Sure Start Children's Centre or select verbal consent."
         )
-    if not data.get("verbal_consent"):
-        errors["verbal_consent"] = "Select whether verbal consent was given"
     return errors
 
 
