@@ -16,6 +16,7 @@ from flask import (
 )
 
 from .backend import get_backend
+from .notifications import get_notifier
 
 bp: Blueprint = Blueprint("main", __name__)
 
@@ -329,9 +330,25 @@ def check() -> Response | str:
     if request.method == "POST":
         ref: str = str(uuid.uuid4())[:8].upper()
         session["ref"] = ref
-        get_backend().create_referral(
-            user=session["user"], answers=answers, ref_number=ref
+        referral = get_backend().create_referral(
+            user=session["user"],
+            answers=answers,
+            ref_number=ref,
         )
+
+        parent_email = str(answers.get("parent_email", "")).strip().lower()
+        if parent_email:
+            try:
+                get_notifier().send_referral_login_details_email(
+                    email_address=parent_email,
+                    ref_number=ref,
+                    postcode=str(referral.get("postcode", "")),
+                )
+            except Exception:
+                current_app.logger.exception(
+                    "Failed to send referral login details email for %s",
+                    ref,
+                )
 
         return redirect(url_for("main.confirmation"))
 
