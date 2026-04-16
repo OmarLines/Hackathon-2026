@@ -9,3 +9,4 @@
 - [x] Removed deprecated field in the pyproject.toml
 - [x] Create deployment documentation (live and dev)
 - [x] Add CI job for documentation generation
+- [x] Clarify problem, solution, backend modes, and user types in README.md

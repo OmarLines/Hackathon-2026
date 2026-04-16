@@ -1,32 +1,35 @@
-# Hackathon-2026
+# Family Hub Referral Portal
 
-## Challenge 01 - Licence Application Digital Service
+## The Problem: Paper-Based Friction
+Early years professionals and healthcare staff (such as midwives or nursery workers) currently navigate a heavily manual, paper-based workflow to refer families to Family Hubs. The existing 4-page PDF ("Request for Children's Centre Service") creates significant administrative friction:
+- **No Visibility:** Neither the referrer nor the family can track the progress of a referral once sent.
+- **Administrative Burden:** Staff spend valuable time manually completing and emailing PDFs.
+- **High Friction for Families:** Parents repeat basic information and face delays in receiving support.
 
-A GOV.UK-styled digital replacement for `FORM-LIC-001-licence-application.pdf`, built with Flask.
+## The Solution: A Streamlined Digital Service
+This application replaces the legacy PDF process with a streamlined, GOV.UK-styled digital portal. It provides:
+- **Instant Submissions:** Rapid digital registration and referral submission.
+- **Progress Tracking:** Real-time visibility for both professionals and families.
+- **Automated Routing:** Ensures referrals reach the right caseworkers faster.
 
-## What it does
+## User Types
 
-- Multi-page form following the GOV.UK "one thing per page" principle
-- Server-side validation with GOV.UK-style error messages
-- Age check (must be 18+) on date of birth
-- Check your answers page before submission
-- Confirmation page with a unique reference number
-- Fully keyboard navigable and screen-reader friendly
+- **Referrers (Professionals):** Early years professionals or healthcare staff who register an account to submit referrals. They can view a dashboard of all their submitted referrals and track their status.
+- **Referees (Families):** Parents or carers who receive a unique reference number and postcode via email. They can log in to view their referral details and confirm their acceptance of the service.
 
-## Specific problem:
-Currently, when early years professionals or healthcare staff (such as midwives or nursery workers) refer a parent and child to a Family Hub, they are forced to navigate a heavily manual, paper-based workflow. The existing process relies on a cumbersome 4-page PDF ("Request for Children's Centre Service") that creates immediate administrative friction and delays vital support for families.
+## Database Modes
 
-The Core Challenges:
+The application supports two backend modes, configurable via the `APP_BACKEND` environment variable:
 
-Administrative Burden for Staff: Referring professionals must locate, download, manually complete, and securely email extensive PDF forms. This redirects valuable time away from frontline care and bogs them down in repetitive paperwork.
+1. **Local Mode (`APP_BACKEND=local`, default):**
+   - Uses in-memory storage.
+   - Data is reset when the application restarts.
+   - Ideal for rapid local development and testing without AWS credentials.
 
-High Friction for Parents: Families—who may already be in vulnerable situations or under stress—face unnecessary bureaucratic hurdles, including physical signature requirements and delays in processing. Furthermore, they often have to repeat the same basic information upon arriving at the Hub for their first session.
-
-Inefficient Processing & Data Silos: Family Hub administration must manually transcribe data from emailed PDFs into internal systems. This slows down triage, delays assigning a caseworker, and leaves Service Managers without real-time analytics regarding referral volumes and physical check-ins.
-
-## Our objective:
-
-To replace the legacy PDF referral process with a streamlined, end-to-end digital portal. By introducing rapid digital registration, automated caseworker routing, and unique family IDs for self-service check-ins, this project aims to reduce referral turnaround times from days to minutes—ensuring families get connected to the support they need with zero administrative friction.
+2. **AWS Mode (`APP_BACKEND=aws`):**
+   - Uses **AWS Cognito** for secure professional user authentication.
+   - Uses **Amazon DynamoDB** for persistent storage of referrals and user profiles.
+   - Requires valid AWS configuration (see [Terraform deploy](#terraform-deploy)).
 
 ## Setup
 
