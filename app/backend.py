@@ -31,6 +31,7 @@ class AppBackend(Protocol):
     def create_referral(self, user: dict[str, Any], answers: dict[str, Any], ref_number: str) -> dict[str, Any]: ...
     def get_referral(self, ref_number: str) -> dict[str, Any] | None: ...
     def get_referrer_profile(self, user: dict[str, Any]) -> dict[str, Any]: ...
+    def hydrate_referrer_user(self, user: dict[str, Any]) -> dict[str, Any] | None: ...
     def has_form_access(self, user: dict[str, Any], form_id: str) -> bool: ...
     def list_referrals_for_referrer(self, user: dict[str, Any]) -> list[dict[str, Any]]: ...
     def register_referrer(self, name: str, email: str, password: str) -> dict[str, Any]: ...
@@ -110,6 +111,16 @@ class LocalBackend:
             "name": referrer.get("name", user.get("name", user["email"])),
             "sub": referrer.get("sub", user.get("sub")),
         }
+
+    def hydrate_referrer_user(self, user: dict[str, Any]) -> dict[str, Any] | None:
+        email = user.get("email")
+        if not isinstance(email, str) or not email:
+            return None
+        referrer = referrers.get(email)
+        if not referrer:
+            return None
+        self._ensure_referrer_defaults(email, referrer)
+        return self._session_user(email, referrer)
 
     def has_form_access(self, user: dict[str, Any], form_id: str) -> bool:
         referrer = referrers.get(user["email"])
@@ -314,6 +325,36 @@ class AwsBackend:
             "email": item.get("email", user.get("email", "")),
             "name": item.get("name", user.get("name", user.get("email", ""))),
             "sub": user["sub"],
+        }
+
+    def hydrate_referrer_user(self, user: dict[str, Any]) -> dict[str, Any] | None:
+        user_sub = user.get("sub")
+        if isinstance(user_sub, str) and user_sub:
+            profile = self.get_referrer_profile(user)
+            return {
+                "email": profile["email"],
+                "name": profile["name"],
+                "sub": user_sub,
+                "type": "referrer",
+            }
+
+        email = user.get("email")
+        if not isinstance(email, str) or not email:
+            return None
+
+        cognito_user = self.cognito_user.get_user_by_email(userpool_id=self.user_pool_id, email=email)
+        if not cognito_user:
+            return None
+        resolved_sub = self.cognito_user.get_attribute_from_user(cognito_user, "sub")
+        if not resolved_sub:
+            return None
+
+        profile = self.get_referrer_profile({"email": email, "sub": resolved_sub})
+        return {
+            "email": profile["email"],
+            "name": profile["name"],
+            "sub": resolved_sub,
+            "type": "referrer",
         }
 
     def has_form_access(self, user: dict[str, Any], form_id: str) -> bool:

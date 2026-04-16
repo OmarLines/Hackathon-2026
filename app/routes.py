@@ -30,7 +30,12 @@ def require_referrer(f: T) -> T:
         user: dict[str, Any] | None = session.get("user")
         if not user or user.get("type") != "referrer":
             return redirect(url_for("auth.login"))
-        if not get_backend().has_form_access(user, current_app.config["CURRENT_FORM_ID"]):
+        hydrated_user = get_backend().hydrate_referrer_user(user)
+        if not hydrated_user:
+            session.clear()
+            return redirect(url_for("auth.login"))
+        session["user"] = hydrated_user
+        if not get_backend().has_form_access(hydrated_user, current_app.config["CURRENT_FORM_ID"]):
             abort(403)
         return f(*args, **kwargs)
 
