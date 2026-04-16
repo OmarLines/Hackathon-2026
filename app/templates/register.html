@@ -49,7 +49,7 @@
 
   <div class="govuk-form-group {% if errors.password %}govuk-form-group--error{% endif %}">
     <label class="govuk-label" for="password">Password</label>
-    <div id="password-hint" class="govuk-hint">Must be at least 8 characters</div>
+    <div id="password-hint" class="govuk-hint">{{ password_hint }}</div>
     {% if errors.password %}
     <p id="password-error" class="govuk-error-message">
       <span class="govuk-visually-hidden">Error:</span> {{ errors.password }}

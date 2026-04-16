@@ -1,7 +1,8 @@
 import uuid
 from datetime import date
-from flask import Blueprint, render_template, request, session, redirect, url_for
-from .store import referrers, referees
+from flask import Blueprint, abort, current_app, redirect, render_template, request, session, url_for
+
+from .backend import get_backend
 
 bp = Blueprint("main", __name__)
 
@@ -13,6 +14,8 @@ def require_referrer(f):
         user = session.get("user")
         if not user or user.get("type") != "referrer":
             return redirect(url_for("auth.login"))
+        if not get_backend().has_form_access(user, current_app.config["CURRENT_FORM_ID"]):
+            abort(403)
         return f(*args, **kwargs)
     return decorated
 
@@ -172,6 +175,7 @@ def index():
 @bp.route("/apply/start")
 @require_referrer
 def start():
+    session.pop("ref", None)
     session.pop("answers", None)
     return redirect(url_for("main.step", step_name="child"))
 
@@ -223,20 +227,7 @@ def check():
     if request.method == "POST":
         ref = str(uuid.uuid4())[:8].upper()
         session["ref"] = ref
-
-        # Create referee account from submitted answers
-        referees[ref] = {
-            "ref_number": ref,
-            "child_name": answers.get("child_name", ""),
-            "postcode": answers.get("postcode", ""),
-            "answers": dict(answers),
-            "referrer_email": session["user"]["email"],
-        }
-
-        # Associate referral with the referrer
-        referrer = referrers.get(session["user"]["email"])
-        if referrer is not None:
-            referrer["referrals"].append(ref)
+        get_backend().create_referral(user=session["user"], answers=answers, ref_number=ref)
 
         return redirect(url_for("main.confirmation"))
 
@@ -249,5 +240,5 @@ def confirmation():
     ref = session.get("ref")
     if not ref:
         return redirect(url_for("main.index"))
-    referee = referees.get(ref, {})
+    referee = get_backend().get_referral(ref) or {}
     return render_template("steps/confirmation.html", ref=ref, postcode=referee.get("postcode", ""))

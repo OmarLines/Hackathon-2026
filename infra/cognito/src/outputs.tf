@@ -32,3 +32,8 @@ output "notify_api_key_secret_name" {
   description = "Name of the GOV Notify API key secret."
   value       = aws_secretsmanager_secret.notify_api_key.name
 }
+
+output "password_policy" {
+  description = "Password policy used by the Cognito user pool."
+  value       = local.default_password_policy
+}
