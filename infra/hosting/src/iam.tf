@@ -45,6 +45,8 @@ data "aws_iam_policy_document" "app_backend_access" {
       "dynamodb:GetItem",
       "dynamodb:PutItem",
       "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:UpdateItem",
     ]
     resources = [
       data.terraform_remote_state.dynamodb.outputs.table_arn,
