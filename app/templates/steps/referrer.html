@@ -46,8 +46,8 @@
   </div>
 
   <div class="govuk-form-group {% if errors.referral_date %}govuk-form-group--error{% endif %}">
-    <div class="govuk-grid-row govuk-grid-row--middle">
-      <div class="govuk-grid-column-two-thirds">
+    <div style="display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap;">
+      <div>
         <label class="govuk-label" for="referral_date">Date of referral</label>
         {% if errors.referral_date %}
         <p id="referral_date-error" class="govuk-error-message">
@@ -59,8 +59,8 @@
                aria-describedby="{% if errors.referral_date %}referral_date-error{% endif %}"
                value="{{ answers.referral_date or '' }}">
       </div>
-      <div class="govuk-grid-column-one-third">
-        <button class="govuk-button govuk-button--secondary govuk-!-margin-top-6 govuk-!-margin-bottom-0"
+      <div>
+        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
                 id="referral_date_today" type="button">
           Today
         </button>
