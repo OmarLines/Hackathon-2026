@@ -46,46 +46,48 @@
   </div>
 
   <div class="govuk-form-group {% if errors.referral_date %}govuk-form-group--error{% endif %}">
-    <fieldset class="govuk-fieldset" role="group"
-              aria-describedby="referral-date-hint {% if errors.referral_date %}referral_date-error{% endif %}">
-      <legend class="govuk-fieldset__legend">
-        <span class="govuk-label">Date of referral</span>
-      </legend>
-      <div id="referral-date-hint" class="govuk-hint">For example, 16 4 2026</div>
-      {% if errors.referral_date %}
-      <p id="referral_date-error" class="govuk-error-message">
-        <span class="govuk-visually-hidden">Error:</span> {{ errors.referral_date }}
-      </p>
-      {% endif %}
-      <div class="govuk-date-input" id="referral_date">
-        <div class="govuk-date-input__item">
-          <div class="govuk-form-group">
-            <label class="govuk-label govuk-date-input__label" for="referral_date_day">Day</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.referral_date %}govuk-input--error{% endif %}"
-                   id="referral_date_day" name="referral_date_day" type="text" inputmode="numeric"
-                   value="{{ answers.referral_date_day or '' }}">
-          </div>
-        </div>
-        <div class="govuk-date-input__item">
-          <div class="govuk-form-group">
-            <label class="govuk-label govuk-date-input__label" for="referral_date_month">Month</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.referral_date %}govuk-input--error{% endif %}"
-                   id="referral_date_month" name="referral_date_month" type="text" inputmode="numeric"
-                   value="{{ answers.referral_date_month or '' }}">
-          </div>
-        </div>
-        <div class="govuk-date-input__item">
-          <div class="govuk-form-group">
-            <label class="govuk-label govuk-date-input__label" for="referral_date_year">Year</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-4 {% if errors.referral_date %}govuk-input--error{% endif %}"
-                   id="referral_date_year" name="referral_date_year" type="text" inputmode="numeric"
-                   value="{{ answers.referral_date_year or '' }}">
-          </div>
-        </div>
+    <div style="display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap;">
+      <div>
+        <label class="govuk-label" for="referral_date">Date of referral</label>
+        {% if errors.referral_date %}
+        <p id="referral_date-error" class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span> {{ errors.referral_date }}
+        </p>
+        {% endif %}
+        <input class="govuk-input govuk-input--width-10 {% if errors.referral_date %}govuk-input--error{% endif %}"
+               id="referral_date" name="referral_date" type="date"
+               aria-describedby="{% if errors.referral_date %}referral_date-error{% endif %}"
+               value="{{ answers.referral_date or '' }}">
       </div>
-    </fieldset>
+      <div>
+        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+                id="referral_date_today" type="button">
+          Today
+        </button>
+      </div>
+    </div>
   </div>
 
   <button class="govuk-button" data-module="govuk-button">Continue</button>
 </form>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script>
+  (() => {
+    const todayButton = document.getElementById("referral_date_today");
+    const referralDateInput = document.getElementById("referral_date");
+    if (!todayButton || !referralDateInput) {
+      return;
+    }
+
+    todayButton.addEventListener("click", () => {
+      const today = new Date();
+      const year = String(today.getFullYear());
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      referralDateInput.value = `${year}-${month}-${day}`;
+    });
+  })();
+</script>
 {% endblock %}

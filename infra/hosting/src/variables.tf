@@ -64,6 +64,18 @@ variable "instance_type" {
   default     = "t3.small"
 }
 
+variable "notify_referrer_registration_template_id" {
+  description = "GOV.UK Notify template ID used for new referrer registration emails."
+  type        = string
+  default     = "de2d184d-7997-4c41-b45f-94e3ed208449"
+}
+
+variable "notify_referral_login_details_template_id" {
+  description = "GOV.UK Notify template ID used for referred person's login details emails."
+  type        = string
+  default     = "83052a6e-52b4-43cd-a01a-106ea482983e"
+}
+
 variable "key_name" {
   description = "Optional EC2 key pair name. Leave null to rely on SSM Session Manager only."
   type        = string

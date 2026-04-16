@@ -1,16 +1,12 @@
-from werkzeug.security import generate_password_hash
+from .dummy_data import referrers_data, referees_data, referrer_details_data
 
 # In-memory stores — reset on app restart (fine for hackathon)
 
 # Referrer accounts keyed by email
-referrers = {
-    "referrer@test.com": {
-        "password_hash": generate_password_hash("password"),
-        "name": "Demo Referrer",
-        "referrals": [],  # list of ref numbers submitted by this referrer
-    }
-}
+referrers = dict(referrers_data)
 
 # Referee accounts created on form submission, keyed by reference number
-# Each entry: { child_name, postcode, answers, referrer_email }
-referees = {}
+referees = dict(referees_data)
+
+# Referrer details keyed by sub
+referrer_details = dict(referrer_details_data)

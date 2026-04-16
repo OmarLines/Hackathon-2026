@@ -8,14 +8,29 @@ APP_INSTALL_PATH="${app_install_path}"
 APP_LOG_DIRECTORY="${app_log_directory}"
 APP_LOG_FILE="${app_log_file}"
 APP_NAME="${app_name}"
+APP_BACKEND="${app_backend}"
 APP_REPO_REF="${app_repo_ref}"
 APP_REPO_URL="${app_repo_url}"
 APP_SERVICE_NAME="${app_service_name}"
 APP_USER="${app_user}"
+AWS_REGION="${aws_region}"
+COGNITO_USER_POOL_CLIENT_ID="${cognito_user_pool_client_id}"
+COGNITO_USER_POOL_ID="${cognito_user_pool_id}"
 CLOUDWATCH_AGENT_CONFIG_PATH="${cloudwatch_agent_config_path}"
 CLOUDWATCH_APP_LOG_GROUP="${cloudwatch_app_log_group}"
 CLOUDWATCH_NGINX_LOG_GROUP="${cloudwatch_nginx_log_group}"
+CURRENT_FORM_ID="${current_form_id}"
 NGINX_SERVER_NAME="${nginx_server_name}"
+NOTIFY_API_KEY_SECRET_NAME="${notify_api_key_secret_name}"
+NOTIFY_REFERRAL_LOGIN_DETAILS_TEMPLATE_ID="${notify_referral_login_details_template_id}"
+NOTIFY_REFERRER_REGISTRATION_TEMPLATE_ID="${notify_template_id}"
+REFERRER_DETAILS_TABLE_NAME="${referrer_details_table_name}"
+REFERRALS_TABLE_NAME="${referrals_table_name}"
+REFERRER_PASSWORD_MIN_LENGTH="${referrer_password_min_length}"
+REFERRER_PASSWORD_REQUIRE_LOWERCASE="${referrer_password_require_lowercase}"
+REFERRER_PASSWORD_REQUIRE_NUMBERS="${referrer_password_require_numbers}"
+REFERRER_PASSWORD_REQUIRE_SYMBOLS="${referrer_password_require_symbols}"
+REFERRER_PASSWORD_REQUIRE_UPPERCASE="${referrer_password_require_uppercase}"
 UV_BIN="${app_install_path}/.local/bin/uv"
 
 dnf update -y
@@ -57,6 +72,21 @@ Group=${app_user}
 WorkingDirectory=${app_directory}
 Environment=HOME=${app_install_path}
 Environment=PATH=${app_install_path}/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=APP_BACKEND=${app_backend}
+Environment=AWS_REGION=${aws_region}
+Environment=COGNITO_USER_POOL_CLIENT_ID=${cognito_user_pool_client_id}
+Environment=COGNITO_USER_POOL_ID=${cognito_user_pool_id}
+Environment=CURRENT_FORM_ID=${current_form_id}
+Environment=NOTIFY_API_KEY_SECRET_NAME=${notify_api_key_secret_name}
+Environment=NOTIFY_REFERRAL_LOGIN_DETAILS_TEMPLATE_ID=${notify_referral_login_details_template_id}
+Environment=NOTIFY_REFERRER_REGISTRATION_TEMPLATE_ID=${notify_template_id}
+Environment=REFERRER_DETAILS_TABLE_NAME=${referrer_details_table_name}
+Environment=REFERRALS_TABLE_NAME=${referrals_table_name}
+Environment=REFERRER_PASSWORD_MIN_LENGTH=${referrer_password_min_length}
+Environment=REFERRER_PASSWORD_REQUIRE_LOWERCASE=${referrer_password_require_lowercase}
+Environment=REFERRER_PASSWORD_REQUIRE_NUMBERS=${referrer_password_require_numbers}
+Environment=REFERRER_PASSWORD_REQUIRE_SYMBOLS=${referrer_password_require_symbols}
+Environment=REFERRER_PASSWORD_REQUIRE_UPPERCASE=${referrer_password_require_uppercase}
 ExecStart=${app_install_path}/.local/bin/uv run --project ${app_directory} --python 3.13 --with gunicorn gunicorn run:app --bind 127.0.0.1:8000 --workers 2
 Restart=always
 RestartSec=5
