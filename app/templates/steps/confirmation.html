@@ -4,22 +4,37 @@
 <div class="govuk-panel govuk-panel--confirmation">
   <h1 class="govuk-panel__title">Referral submitted</h1>
   <div class="govuk-panel__body">
-    Your reference number<br>
+    Reference number<br>
     <strong>{{ ref }}</strong>
   </div>
 </div>
 
 <p class="govuk-body">We have received your referral to Children's Centre Services.</p>
 
+<h2 class="govuk-heading-m">Referred person's login details</h2>
+<p class="govuk-body">
+  Share these details with the family so they can sign in and view their referral:
+</p>
+<dl class="govuk-summary-list">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Reference number</dt>
+    <dd class="govuk-summary-list__value"><strong>{{ ref }}</strong></dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Postcode</dt>
+    <dd class="govuk-summary-list__value"><strong>{{ postcode }}</strong></dd>
+  </div>
+</dl>
+
 <h2 class="govuk-heading-m">What happens next</h2>
 <p class="govuk-body">
   Send the completed referral by email to
   <a href="mailto:earlyinterventionhub@northumberland.gov.uk" class="govuk-link">earlyinterventionhub@northumberland.gov.uk</a>.
-  Please use the subject line: <strong>SSCC – Request for Service</strong>.
+  Use the subject line: <strong>SSCC – Request for Service</strong>.
 </p>
-<p class="govuk-body">An allocated worker will be in touch to confirm the course start date.</p>
+<p class="govuk-body">An allocated worker will confirm the course start date.</p>
 
 <p class="govuk-body">
-  <a href="/" class="govuk-link">Submit another referral</a>
+  <a href="{{ url_for('auth.dashboard') }}" class="govuk-link">Return to your dashboard</a>
 </p>
 {% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Referrer dashboard{% endblock %}
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">Welcome, {{ user.name }}</h1>
+
+    <a href="{{ url_for('main.start') }}" class="govuk-button">
+      Submit a new referral
+    </a>
+
+    <h2 class="govuk-heading-m">Your submitted referrals</h2>
+
+    {% if referrals %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header">Reference</th>
+          <th class="govuk-table__header">Child's name</th>
+          <th class="govuk-table__header">Service</th>
+          <th class="govuk-table__header">Referee login</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for r in referrals %}
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <strong>{{ r.ref_number }}</strong>
+          </td>
+          <td class="govuk-table__cell">{{ r.child_name }}</td>
+          <td class="govuk-table__cell">{{ r.answers.service or '—' }}</td>
+          <td class="govuk-table__cell govuk-!-font-size-16">
+            Ref: <strong>{{ r.ref_number }}</strong><br>
+            Postcode: <strong>{{ r.postcode }}</strong>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="govuk-body">You have not submitted any referrals yet.</p>
+    {% endif %}
+
+  </div>
+</div>
+
+<p class="govuk-body">
+  <a href="{{ url_for('auth.logout') }}" class="govuk-link">Sign out</a>
+</p>
+
+{% endblock %}
