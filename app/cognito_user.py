@@ -79,7 +79,9 @@ class CognitoUser:
         return users[0]
 
     @staticmethod
-    def get_attribute_from_user(user: dict[str, Any], attribute_name: str) -> str | None:
+    def get_attribute_from_user(
+        user: dict[str, Any], attribute_name: str
+    ) -> str | None:
         attributes = user.get("Attributes", [])
         if not isinstance(attributes, list):
             return None

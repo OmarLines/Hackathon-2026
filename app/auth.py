@@ -1,4 +1,12 @@
-from flask import Blueprint, current_app, redirect, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from .backend import DuplicateReferrerError, InvalidReferrerPasswordError, get_backend
 from .notifications import get_notifier
@@ -38,11 +46,17 @@ def _build_password_hint(config: dict[str, object]) -> str:
 def _password_meets_policy(password: str, config: dict[str, object]) -> bool:
     if len(password) < int(config.get("REFERRER_PASSWORD_MIN_LENGTH", 8) or 8):
         return False
-    if config.get("REFERRER_PASSWORD_REQUIRE_LOWERCASE") and not any(char.islower() for char in password):
+    if config.get("REFERRER_PASSWORD_REQUIRE_LOWERCASE") and not any(
+        char.islower() for char in password
+    ):
         return False
-    if config.get("REFERRER_PASSWORD_REQUIRE_UPPERCASE") and not any(char.isupper() for char in password):
+    if config.get("REFERRER_PASSWORD_REQUIRE_UPPERCASE") and not any(
+        char.isupper() for char in password
+    ):
         return False
-    if config.get("REFERRER_PASSWORD_REQUIRE_NUMBERS") and not any(char.isdigit() for char in password):
+    if config.get("REFERRER_PASSWORD_REQUIRE_NUMBERS") and not any(
+        char.isdigit() for char in password
+    ):
         return False
     if config.get("REFERRER_PASSWORD_REQUIRE_SYMBOLS") and not any(
         not char.isalnum() for char in password
@@ -84,7 +98,9 @@ def register():
 
         if not errors:
             try:
-                session["user"] = get_backend().register_referrer(name=name, email=email, password=password)
+                session["user"] = get_backend().register_referrer(
+                    name=name, email=email, password=password
+                )
                 sign_in_url = url_for("auth.login", _external=True)
                 try:
                     get_notifier().send_referrer_registration_email(
@@ -136,7 +152,9 @@ def login():
         elif user_type == "referee":
             ref_number = request.form.get("ref_number", "").strip().upper()
             postcode = request.form.get("postcode", "").strip().upper().replace(" ", "")
-            user = get_backend().authenticate_referee(ref_number=ref_number, postcode=postcode)
+            user = get_backend().authenticate_referee(
+                ref_number=ref_number, postcode=postcode
+            )
             if user:
                 session["user"] = user
                 return redirect(url_for("auth.dashboard"))
@@ -170,7 +188,9 @@ def dashboard():
         profile = get_backend().get_referrer_profile(hydrated_user)
         user = {**hydrated_user, "name": profile["name"]}
         submitted = get_backend().list_referrals_for_referrer(hydrated_user)
-        return render_template("dashboard_referrer.html", user=user, referrals=submitted)
+        return render_template(
+            "dashboard_referrer.html", user=user, referrals=submitted
+        )
 
     referee = get_backend().get_referral(user["ref_number"]) or {}
     return render_template("dashboard_referee.html", user=user, referral=referee)

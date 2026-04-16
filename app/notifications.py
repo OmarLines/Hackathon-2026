@@ -7,7 +7,10 @@ from flask import current_app
 
 
 class AppNotifier(Protocol):
-    def send_referrer_registration_email(self, email_address: str, name: str, sign_in_url: str) -> None: ...
+    def send_referrer_registration_email(
+        self, email_address: str, name: str, sign_in_url: str
+    ) -> None: ...
+
     def send_referral_login_details_email(
         self,
         email_address: str,
@@ -31,7 +34,9 @@ def build_notifier(config: dict[str, Any]) -> AppNotifier:
         notify_api_key_secret_name=secret_name,
         referral_login_details_template_id=referral_login_details_template_id,
         registration_template_id=registration_template_id,
-        service_name=config.get("SERVICE_NAME", "Request for Children's Centre Service"),
+        service_name=config.get(
+            "SERVICE_NAME", "Request for Children's Centre Service"
+        ),
     )
 
 
@@ -40,7 +45,9 @@ def get_notifier() -> AppNotifier:
 
 
 class NullNotifier:
-    def send_referrer_registration_email(self, email_address: str, name: str, sign_in_url: str) -> None:
+    def send_referrer_registration_email(
+        self, email_address: str, name: str, sign_in_url: str
+    ) -> None:
         return None
 
     def send_referral_login_details_email(
@@ -72,7 +79,9 @@ class NotifyNotifier:
         self.service_name = service_name
         self._api_key: str | None = None
 
-    def send_referrer_registration_email(self, email_address: str, name: str, sign_in_url: str) -> None:
+    def send_referrer_registration_email(
+        self, email_address: str, name: str, sign_in_url: str
+    ) -> None:
         if not self.registration_template_id:
             return None
 
@@ -110,7 +119,9 @@ class NotifyNotifier:
         if self._api_key:
             return self._api_key
 
-        response = self.secretsmanager.get_secret_value(SecretId=self.notify_api_key_secret_name)
+        response = self.secretsmanager.get_secret_value(
+            SecretId=self.notify_api_key_secret_name
+        )
         secret_string = response.get("SecretString")
         if not secret_string:
             raise RuntimeError("Notify API key secret has no SecretString")

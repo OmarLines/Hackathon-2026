@@ -32,7 +32,9 @@ def create_app():
             "NOTIFY_REFERRER_REGISTRATION_TEMPLATE_ID"
         ),
         REFERRALS_TABLE_NAME=os.getenv("REFERRALS_TABLE_NAME"),
-        REFERRER_PASSWORD_MIN_LENGTH=int(os.getenv("REFERRER_PASSWORD_MIN_LENGTH", "8")),
+        REFERRER_PASSWORD_MIN_LENGTH=int(
+            os.getenv("REFERRER_PASSWORD_MIN_LENGTH", "8")
+        ),
         REFERRER_PASSWORD_REQUIRE_LOWERCASE=_env_bool(
             "REFERRER_PASSWORD_REQUIRE_LOWERCASE", False
         ),
