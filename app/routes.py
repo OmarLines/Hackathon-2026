@@ -1,8 +1,20 @@
 import uuid
 from datetime import date
 from flask import Blueprint, render_template, request, session, redirect, url_for
+from .store import referrers, referees
 
 bp = Blueprint("main", __name__)
+
+
+def require_referrer(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        user = session.get("user")
+        if not user or user.get("type") != "referrer":
+            return redirect(url_for("auth.login"))
+        return f(*args, **kwargs)
+    return decorated
 
 STEPS = [
     "child", "address", "parent", "referrer",
@@ -146,11 +158,21 @@ SERVICE_LABELS = {v: label for options in SERVICE_OPTIONS.values() for v, label 
 
 @bp.route("/")
 def index():
-    session.clear()
+    user = session.get("user")
+    if user:
+        return redirect(url_for("auth.dashboard"))
+    return redirect(url_for("auth.login"))
+
+
+@bp.route("/apply/start")
+@require_referrer
+def start():
+    session.pop("answers", None)
     return redirect(url_for("main.step", step_name="child"))
 
 
 @bp.route("/apply/<step_name>", methods=["GET", "POST"])
+@require_referrer
 def step(step_name):
     if step_name not in STEPS or step_name in ("check", "confirmation"):
         return redirect(url_for("main.index"))
@@ -186,6 +208,7 @@ def step(step_name):
 
 
 @bp.route("/apply/check", methods=["GET", "POST"])
+@require_referrer
 def check():
     answers = session.get("answers", {})
     if not answers:
@@ -193,13 +216,30 @@ def check():
     if request.method == "POST":
         ref = str(uuid.uuid4())[:8].upper()
         session["ref"] = ref
+
+        # Create referee account from submitted answers
+        referees[ref] = {
+            "ref_number": ref,
+            "child_name": answers.get("child_name", ""),
+            "postcode": answers.get("postcode", ""),
+            "answers": dict(answers),
+            "referrer_email": session["user"]["email"],
+        }
+
+        # Associate referral with the referrer
+        referrer = referrers.get(session["user"]["email"])
+        if referrer is not None:
+            referrer["referrals"].append(ref)
+
         return redirect(url_for("main.confirmation"))
     return render_template("steps/check.html", answers=answers, service_labels=SERVICE_LABELS)
 
 
 @bp.route("/apply/confirmation")
+@require_referrer
 def confirmation():
     ref = session.get("ref")
     if not ref:
         return redirect(url_for("main.index"))
-    return render_template("steps/confirmation.html", ref=ref)
+    referee = referees.get(ref, {})
+    return render_template("steps/confirmation.html", ref=ref, postcode=referee.get("postcode", ""))

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+
+{% if errors.user_type or errors.referrer_login or errors.referee_login %}
+<div class="govuk-error-summary" data-module="govuk-error-summary">
+  <div role="alert">
+    <h2 class="govuk-error-summary__title">There is a problem</h2>
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+        {% if errors.user_type %}
+        <li><a href="#user_type-referrer">{{ errors.user_type }}</a></li>
+        {% endif %}
+        {% if errors.referrer_login %}
+        <li><a href="#email">{{ errors.referrer_login }}</a></li>
+        {% endif %}
+        {% if errors.referee_login %}
+        <li><a href="#ref_number">{{ errors.referee_login }}</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<h1 class="govuk-heading-l">Sign in</h1>
+
+<form method="post" novalidate>
+
+  <div class="govuk-form-group {% if errors.user_type %}govuk-form-group--error{% endif %}">
+    <fieldset class="govuk-fieldset" aria-describedby="{% if errors.user_type %}user_type-error{% endif %}">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+        <h2 class="govuk-fieldset__heading">How are you accessing this service?</h2>
+      </legend>
+      {% if errors.user_type %}
+      <p id="user_type-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors.user_type }}
+      </p>
+      {% endif %}
+
+      <div class="govuk-radios" data-module="govuk-radios">
+
+        <!-- Referrer option -->
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="user_type-referrer" name="user_type"
+                 type="radio" value="referrer"
+                 data-aria-controls="referrer-fields"
+                 {% if form.get('user_type') == 'referrer' %}checked{% endif %}>
+          <label class="govuk-label govuk-radios__label" for="user_type-referrer">
+            I am a referrer
+          </label>
+          <div id="user_type-referrer-item-hint" class="govuk-hint govuk-radios__hint">
+            For professionals submitting referrals on behalf of families
+          </div>
+        </div>
+
+        <div class="govuk-radios__conditional {% if form.get('user_type') != 'referrer' %}govuk-radios__conditional--hidden{% endif %}"
+             id="referrer-fields">
+
+          <div class="govuk-form-group {% if errors.referrer_login %}govuk-form-group--error{% endif %}">
+            <label class="govuk-label" for="email">Email address</label>
+            {% if errors.referrer_login %}
+            <p id="email-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ errors.referrer_login }}
+            </p>
+            {% endif %}
+            <input class="govuk-input {% if errors.referrer_login %}govuk-input--error{% endif %}"
+                   id="email" name="email" type="email" autocomplete="email" spellcheck="false"
+                   aria-describedby="{% if errors.referrer_login %}email-error{% endif %}"
+                   value="{{ form.get('email', '') }}">
+          </div>
+
+          <div class="govuk-form-group {% if errors.referrer_login %}govuk-form-group--error{% endif %}">
+            <label class="govuk-label" for="password">Password</label>
+            <input class="govuk-input {% if errors.referrer_login %}govuk-input--error{% endif %}"
+                   id="password" name="password" type="password" autocomplete="current-password">
+          </div>
+
+        </div>
+
+        <!-- Divider -->
+        <div class="govuk-radios__divider">or</div>
+
+        <!-- Referee option -->
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="user_type-referee" name="user_type"
+                 type="radio" value="referee"
+                 data-aria-controls="referee-fields"
+                 {% if form.get('user_type') == 'referee' %}checked{% endif %}>
+          <label class="govuk-label govuk-radios__label" for="user_type-referee">
+            I have been referred to a service
+          </label>
+          <div id="user_type-referee-item-hint" class="govuk-hint govuk-radios__hint">
+            Use the reference number and postcode provided at referral
+          </div>
+        </div>
+
+        <div class="govuk-radios__conditional {% if form.get('user_type') != 'referee' %}govuk-radios__conditional--hidden{% endif %}"
+             id="referee-fields">
+
+          <div class="govuk-form-group {% if errors.referee_login %}govuk-form-group--error{% endif %}">
+            <label class="govuk-label" for="ref_number">Reference number</label>
+            {% if errors.referee_login %}
+            <p id="ref_number-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ errors.referee_login }}
+            </p>
+            {% endif %}
+            <input class="govuk-input govuk-input--width-10 {% if errors.referee_login %}govuk-input--error{% endif %}"
+                   id="ref_number" name="ref_number" type="text"
+                   aria-describedby="{% if errors.referee_login %}ref_number-error{% endif %}"
+                   value="{{ form.get('ref_number', '') }}" spellcheck="false">
+          </div>
+
+          <div class="govuk-form-group {% if errors.referee_login %}govuk-form-group--error{% endif %}">
+            <label class="govuk-label" for="postcode">Postcode</label>
+            <input class="govuk-input govuk-input--width-10 {% if errors.referee_login %}govuk-input--error{% endif %}"
+                   id="postcode" name="postcode" type="text" autocomplete="postal-code"
+                   value="{{ form.get('postcode', '') }}">
+          </div>
+
+        </div>
+
+      </div>
+    </fieldset>
+  </div>
+
+  <button class="govuk-button" data-module="govuk-button">Sign in</button>
+
+</form>
+
+<p class="govuk-body">
+  Are you a referrer without an account?
+  <a href="{{ url_for('auth.register') }}" class="govuk-link">Create a referrer account</a>
+</p>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Your referral{% endblock %}
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">Your referral</h1>
+
+    <div class="govuk-inset-text">
+      Your reference number is <strong>{{ referral.ref_number }}</strong>
+    </div>
+
+    <h2 class="govuk-heading-m">Child details</h2>
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Name</dt>
+        <dd class="govuk-summary-list__value">{{ referral.answers.child_name }}</dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Date of birth</dt>
+        <dd class="govuk-summary-list__value">
+          {{ referral.answers.child_dob_day }}/{{ referral.answers.child_dob_month }}/{{ referral.answers.child_dob_year }}
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Gender</dt>
+        <dd class="govuk-summary-list__value">{{ referral.answers.gender }}</dd>
+      </div>
+    </dl>
+
+    <h2 class="govuk-heading-m">Service requested</h2>
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Type</dt>
+        <dd class="govuk-summary-list__value">{{ referral.answers.service_type | capitalize }}</dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Service</dt>
+        <dd class="govuk-summary-list__value">{{ referral.answers.service }}</dd>
+      </div>
+    </dl>
+
+    <h2 class="govuk-heading-m">What happens next</h2>
+    <p class="govuk-body">
+      An allocated worker will be in touch to confirm your course start date. If you have questions,
+      contact
+      <a href="mailto:earlyinterventionhub@northumberland.gov.uk" class="govuk-link">earlyinterventionhub@northumberland.gov.uk</a>.
+    </p>
+
+  </div>
+</div>
+
+<p class="govuk-body">
+  <a href="{{ url_for('auth.logout') }}" class="govuk-link">Sign out</a>
+</p>
+
+{% endblock %}
