@@ -31,6 +31,17 @@
     <a href="{{ url_for('main.step', step_name=prev_step) }}" class="govuk-back-link">Back</a>
     {% endif %}
     <main class="govuk-main-wrapper" id="main-content" role="main">
+      <div class="govuk-width-container govuk-!-padding-bottom-6">
+        <details class="govuk-details" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Privacy notice</span>
+          </summary>
+          <div class="govuk-details__text">
+            <p>We collect and use the information you provide to process referrals and support families. Your information will only be used for this service and shared with trusted partners where required to deliver care or meet legal obligations.</p>
+            <p>If you have any questions, please contact the service provider or refer to the privacy policy.</p>
+          </div>
+        </details>
+      </div>
       {% block content %}{% endblock %}
     </main>
   </div>
