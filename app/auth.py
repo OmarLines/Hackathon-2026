@@ -2,6 +2,7 @@ import re
 
 from flask import (
     Blueprint,
+    Response,
     current_app,
     redirect,
     render_template,
@@ -81,7 +82,7 @@ def _email_is_valid(email: str) -> bool:
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
-def register():
+def register() -> Response | str:
     if session.get("user"):
         return redirect(url_for("auth.dashboard"))
 
@@ -143,7 +144,7 @@ def register():
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
-def login():
+def login() -> Response | str:
     if session.get("user"):
         return redirect(url_for("auth.dashboard"))
 
@@ -183,13 +184,13 @@ def login():
 
 
 @auth_bp.route("/logout")
-def logout():
+def logout() -> Response | str:
     session.clear()
     return redirect(url_for("auth.login"))
 
 
 @auth_bp.route("/dashboard")
-def dashboard():
+def dashboard() -> Response | str:
     user = session.get("user")
     if not user:
         return redirect(url_for("auth.login"))

@@ -5,5 +5,5 @@
 - [x] Add a github action to lint with ruff using the latest action and to run all tests
 - [x] Add 'response' capability to family view (accept referral)
 - [x] Professionals can see acceptance status of referrals
-- [ ] Reolve the type inconsistency in routes.py - are we returning werkzeug responses or flask responses?
-- [ ] Something is wrong with the toml setup - "warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead"
+- [x] Resolve the type inconsistency in routes.py (standardized on flask.Response)
+- [x] Removed deprecated field in the pyproject.toml

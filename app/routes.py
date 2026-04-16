@@ -1,11 +1,10 @@
-import uuid
 import re
+import uuid
 from datetime import date
 from typing import Any, Callable, TypeVar
 
 from flask import (
     Blueprint,
-    Response,
     abort,
     current_app,
     redirect,
@@ -14,6 +13,7 @@ from flask import (
     session,
     url_for,
 )
+from flask.typing import ResponseReturnValue
 
 from .backend import get_backend
 from .notifications import get_notifier
@@ -239,7 +239,7 @@ SERVICE_LABELS: dict[str, str] = {
 
 
 @bp.route("/")
-def index() -> Response:
+def index() -> ResponseReturnValue:
     user: dict[str, Any] | None = session.get("user")
     if user:
         return redirect(url_for("auth.dashboard"))
@@ -248,7 +248,7 @@ def index() -> Response:
 
 @bp.route("/apply/start")
 @require_referrer
-def start() -> Response:
+def start() -> ResponseReturnValue:
     session.pop("ref", None)
     session.pop("answers", None)
     return redirect(url_for("main.step", step_name="child"))
@@ -256,7 +256,7 @@ def start() -> Response:
 
 @bp.route("/apply/<step_name>", methods=["GET", "POST"])
 @require_referrer
-def step(step_name: str) -> Response | str:
+def step(step_name: str) -> ResponseReturnValue:
     if step_name not in STEPS or step_name in ("check", "confirmation"):
         return redirect(url_for("main.index"))
 
@@ -304,7 +304,7 @@ def step(step_name: str) -> Response | str:
 
 @bp.route("/apply/check", methods=["GET", "POST"])
 @require_referrer
-def check() -> Response | str:
+def check() -> ResponseReturnValue:
     answers: dict[str, Any] = session.get("answers", {})
     if not answers:
         return redirect(url_for("main.index"))
@@ -343,7 +343,7 @@ def check() -> Response | str:
 
 @bp.route("/apply/confirmation")
 @require_referrer
-def confirmation() -> Response | str:
+def confirmation() -> ResponseReturnValue:
     ref: str | None = session.get("ref")
     if not ref:
         return redirect(url_for("main.index"))
@@ -354,9 +354,13 @@ def confirmation() -> Response | str:
 
 
 @bp.route("/referral/<ref_number>/accept", methods=["POST"])
-def accept_referral(ref_number: str) -> Response:
+def accept_referral(ref_number: str) -> ResponseReturnValue:
     user = session.get("user")
-    if not user or user.get("type") != "referee" or user.get("ref_number") != ref_number:
+    if (
+        not user
+        or user.get("type") != "referee"
+        or user.get("ref_number") != ref_number
+    ):
         abort(403)
 
     get_backend().update_referral_status(ref_number, "accepted")
