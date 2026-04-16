@@ -13,7 +13,7 @@ Test admin password: `admin`
 
 You can also sign up for a new account to test it.
 
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/9d41b5c5-5a1d-4d1c-9684-abceb3bfea53" />
+![Transformation diagram](transformation_diagram.png)
 
 
 

@@ -13,3 +13,4 @@
 - [x] Clarify problem, solution, backend modes, and user types in README.md
 - [x] Make the referrer view table full width
 - [x] Add cache folders to .gitignore and optimize CI caching with uv
+- [x] Convert README img tag to markdown block for transformation diagram
