@@ -19,6 +19,9 @@ You can also sign up for a new account to test it.
 
 ## The Problem: Paper-Based Friction
 Early years professionals and healthcare staff (such as midwives or nursery workers) currently navigate a heavily manual, paper-based workflow to refer families to Family Hubs. The existing 4-page PDF ("Request for Children's Centre Service") creates significant administrative friction:
+
+This service replaces the current paper form: [Request for Children's Centre Service](docs/request-for-childrens-centre-service.pdf)
+
 - **No Visibility:** Neither the referrer nor the family can track the progress of a referral once sent.
 - **Administrative Burden:** Staff spend valuable time manually completing and emailing PDFs.
 - **High Friction for Families:** Parents repeat basic information and face delays in receiving support.
