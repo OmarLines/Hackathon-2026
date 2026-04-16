@@ -4,7 +4,11 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 
 bp = Blueprint("main", __name__)
 
-STEPS = ["name", "dob", "address", "licence_type", "previous_licence", "declaration", "check", "confirmation"]
+STEPS = [
+    "child", "address", "parent", "referrer",
+    "service_type", "service_selection", "additional_info",
+    "consent", "check", "confirmation",
+]
 
 
 def next_step(current):
@@ -12,80 +16,138 @@ def next_step(current):
     return STEPS[idx + 1] if idx + 1 < len(STEPS) else None
 
 
-def validate_name(data):
+def validate_child(data):
     errors = {}
-    if not data.get("full_name", "").strip():
-        errors["full_name"] = "Enter your full name"
-    return errors
-
-
-def validate_dob(data):
-    errors = {}
-    day, month, year = data.get("dob_day", ""), data.get("dob_month", ""), data.get("dob_year", "")
+    if not data.get("child_name", "").strip():
+        errors["child_name"] = "Enter the child's name"
+    day = data.get("child_dob_day", "")
+    month = data.get("child_dob_month", "")
+    year = data.get("child_dob_year", "")
     if not day or not month or not year:
-        errors["dob"] = "Enter your date of birth"
-        return errors
-    try:
-        dob = date(int(year), int(month), int(day))
-        today = date.today()
-        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-        if age < 18:
-            errors["dob"] = "You must be 18 or over to apply"
-        if dob > today:
-            errors["dob"] = "Date of birth must be in the past"
-    except ValueError:
-        errors["dob"] = "Enter a real date of birth"
+        errors["child_dob"] = "Enter the child's date of birth"
+    else:
+        try:
+            dob = date(int(year), int(month), int(day))
+            if dob > date.today():
+                errors["child_dob"] = "Date of birth must be in the past"
+        except ValueError:
+            errors["child_dob"] = "Enter a real date of birth"
+    if not data.get("gender", "").strip():
+        errors["gender"] = "Enter the child's gender"
     return errors
 
 
 def validate_address(data):
     errors = {}
     if not data.get("address_line1", "").strip():
-        errors["address_line1"] = "Enter the first line of your address"
+        errors["address_line1"] = "Enter the first line of the address"
     if not data.get("town", "").strip():
-        errors["town"] = "Enter your town or city"
-    postcode = data.get("postcode", "").strip()
-    if not postcode:
-        errors["postcode"] = "Enter your postcode"
+        errors["town"] = "Enter the town or city"
+    if not data.get("postcode", "").strip():
+        errors["postcode"] = "Enter the postcode"
+    if not data.get("tel_no", "").strip():
+        errors["tel_no"] = "Enter a telephone number"
     return errors
 
 
-def validate_licence_type(data):
+def validate_parent(data):
     errors = {}
-    if not data.get("licence_type"):
-        errors["licence_type"] = "Select a licence type"
+    if not data.get("parent_name", "").strip():
+        errors["parent_name"] = "Enter the parent or carer's name"
+    if not data.get("locality", "").strip():
+        errors["locality"] = "Enter the locality"
     return errors
 
 
-def validate_declaration(data):
+def validate_referrer(data):
     errors = {}
-    if not data.get("declaration"):
-        errors["declaration"] = "You must agree to the declaration to submit"
+    if not data.get("referrer_name", "").strip():
+        errors["referrer_name"] = "Enter the referrer's name"
+    if not data.get("role_agency", "").strip():
+        errors["role_agency"] = "Enter the role or agency"
+    day = data.get("referral_date_day", "")
+    month = data.get("referral_date_month", "")
+    year = data.get("referral_date_year", "")
+    if not day or not month or not year:
+        errors["referral_date"] = "Enter the date of referral"
+    else:
+        try:
+            date(int(year), int(month), int(day))
+        except ValueError:
+            errors["referral_date"] = "Enter a real date of referral"
+    return errors
+
+
+def validate_service_type(data):
+    errors = {}
+    if not data.get("service_type"):
+        errors["service_type"] = "Select a service type"
+    return errors
+
+
+def validate_service_selection(data):
+    errors = {}
+    if not data.get("service"):
+        errors["service"] = "Select a service"
+    return errors
+
+
+def validate_consent(data):
+    errors = {}
+    if not data.get("registered_sure_start"):
+        errors["registered_sure_start"] = "Confirm the family is registered with Sure Start Children's Centre"
+    if not data.get("verbal_consent"):
+        errors["verbal_consent"] = "Select whether verbal consent was given"
     return errors
 
 
 VALIDATORS = {
-    "name": validate_name,
-    "dob": validate_dob,
+    "child": validate_child,
     "address": validate_address,
-    "licence_type": validate_licence_type,
-    "declaration": validate_declaration,
+    "parent": validate_parent,
+    "referrer": validate_referrer,
+    "service_type": validate_service_type,
+    "service_selection": validate_service_selection,
+    "consent": validate_consent,
 }
 
 FORM_FIELDS = {
-    "name": ["full_name"],
-    "dob": ["dob_day", "dob_month", "dob_year"],
-    "address": ["address_line1", "address_line2", "address_line3", "town", "postcode"],
-    "licence_type": ["licence_type"],
-    "previous_licence": ["previous_licence_number"],
-    "declaration": ["declaration"],
+    "child": ["child_name", "child_dob_day", "child_dob_month", "child_dob_year", "gender"],
+    "address": ["address_line1", "address_line2", "town", "postcode", "tel_no"],
+    "parent": ["parent_name", "parent_email", "parent_dob_day", "parent_dob_month", "parent_dob_year", "family_tel", "locality"],
+    "referrer": ["referrer_name", "role_agency", "referral_date_day", "referral_date_month", "referral_date_year"],
+    "service_type": ["service_type"],
+    "service_selection": ["service"],
+    "additional_info": ["additional_info"],
+    "consent": ["registered_sure_start", "verbal_consent"],
 }
+
+SERVICE_OPTIONS = {
+    "prevention": [
+        ("brilliant_babies", "Brilliant Babies (Conception – 1 Year)"),
+        ("parent_plus", "Parent Plus (9 Months – 2+ Years)"),
+        ("tiny_talkers", "Tiny Talkers (1 – 2+ Years)"),
+        ("great_expectations", "Great Expectations (1 – 2+ Years)"),
+    ],
+    "intervention": [
+        ("incredible_babies", "Incredible Babies (Birth to 12 Months)"),
+        ("incredible_toddlers", "Incredible Toddlers/Pre-School (1 – 6 Years)"),
+        ("families_in_making", "Families in the Making (Pre-Birth)"),
+        ("henry", "HENRY (0 – 4 Years)"),
+        ("healthy_families", "Healthy Families Growing Up (5 – 11 Years)"),
+        ("freedom_programme", "Freedom Programme (Female 16+)"),
+        ("recovery_toolkit_female", "Recovery Toolkit (Female 16+)"),
+        ("recovery_toolkit_children", "Recovery Toolkit (Children/YP 8+)"),
+    ],
+}
+
+SERVICE_LABELS = {v: label for options in SERVICE_OPTIONS.values() for v, label in options}
 
 
 @bp.route("/")
 def index():
     session.clear()
-    return redirect(url_for("main.step", step_name="name"))
+    return redirect(url_for("main.step", step_name="child"))
 
 
 @bp.route("/apply/<step_name>", methods=["GET", "POST"])
@@ -96,11 +158,13 @@ def step(step_name):
     answers = session.get("answers", {})
     errors = {}
 
+    if step_name == "service_selection" and not answers.get("service_type"):
+        return redirect(url_for("main.step", step_name="service_type"))
+
     if request.method == "POST":
         form_data = request.form.to_dict()
-        # Checkboxes won't appear in form_data if unchecked — handle explicitly
-        if step_name == "declaration":
-            form_data["declaration"] = form_data.get("declaration", "")
+        if step_name == "consent":
+            form_data["registered_sure_start"] = form_data.get("registered_sure_start", "")
 
         validator = VALIDATORS.get(step_name)
         if validator:
@@ -112,7 +176,13 @@ def step(step_name):
             session["answers"] = answers
             return redirect(url_for("main.step", step_name=next_step(step_name)))
 
-    return render_template(f"steps/{step_name}.html", answers=answers, errors=errors)
+    extra = {}
+    if step_name == "service_selection":
+        service_type = answers.get("service_type", "prevention")
+        extra["service_options"] = SERVICE_OPTIONS.get(service_type, [])
+        extra["service_type_label"] = "Prevention" if service_type == "prevention" else "Intervention"
+
+    return render_template(f"steps/{step_name}.html", answers=answers, errors=errors, **extra)
 
 
 @bp.route("/apply/check", methods=["GET", "POST"])
@@ -124,7 +194,7 @@ def check():
         ref = str(uuid.uuid4())[:8].upper()
         session["ref"] = ref
         return redirect(url_for("main.confirmation"))
-    return render_template("steps/check.html", answers=answers)
+    return render_template("steps/check.html", answers=answers, service_labels=SERVICE_LABELS)
 
 
 @bp.route("/apply/confirmation")

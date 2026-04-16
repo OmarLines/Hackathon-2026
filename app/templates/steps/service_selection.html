@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Which {{ service_type_label | lower }} service do you require?{% endblock %}
+{% block content %}
+<form method="post" novalidate>
+  {% if errors %}
+  <div class="govuk-error-summary" data-module="govuk-error-summary">
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">There is a problem</h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          {% for field, msg in errors.items() %}
+          <li><a href="#service-{{ service_options[0][0] }}">{{ msg }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="govuk-form-group {% if errors.service %}govuk-form-group--error{% endif %}">
+    <fieldset class="govuk-fieldset"
+              aria-describedby="{% if errors.service %}service-error{% endif %}">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 class="govuk-fieldset__heading">
+          Which {{ service_type_label | lower }} service do you require?
+        </h1>
+      </legend>
+      {% if errors.service %}
+      <p id="service-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors.service }}
+      </p>
+      {% endif %}
+      <div class="govuk-radios" data-module="govuk-radios">
+        {% for value, label in service_options %}
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="service-{{ value }}" name="service"
+                 type="radio" value="{{ value }}"
+                 {% if answers.service == value %}checked{% endif %}>
+          <label class="govuk-label govuk-radios__label" for="service-{{ value }}">
+            {{ label }}
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+    </fieldset>
+  </div>
+
+  <button class="govuk-button" data-module="govuk-button">Continue</button>
+</form>
+{% endblock %}

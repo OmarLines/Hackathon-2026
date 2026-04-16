@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Which type of service do you require?{% endblock %}
+{% block content %}
+<form method="post" novalidate>
+  {% if errors %}
+  <div class="govuk-error-summary" data-module="govuk-error-summary">
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">There is a problem</h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          {% for field, msg in errors.items() %}
+          <li><a href="#service_type-prevention">{{ msg }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="govuk-form-group {% if errors.service_type %}govuk-form-group--error{% endif %}">
+    <fieldset class="govuk-fieldset"
+              aria-describedby="service-type-hint {% if errors.service_type %}service_type-error{% endif %}">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 class="govuk-fieldset__heading">Which type of service do you require?</h1>
+      </legend>
+      <div id="service-type-hint" class="govuk-hint">
+        Please complete a separate form for each service requested.
+      </div>
+      {% if errors.service_type %}
+      <p id="service_type-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors.service_type }}
+      </p>
+      {% endif %}
+      <div class="govuk-radios" data-module="govuk-radios">
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="service_type-prevention" name="service_type"
+                 type="radio" value="prevention"
+                 {% if answers.service_type == 'prevention' %}checked{% endif %}>
+          <label class="govuk-label govuk-radios__label" for="service_type-prevention">
+            Prevention service
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="service_type-intervention" name="service_type"
+                 type="radio" value="intervention"
+                 {% if answers.service_type == 'intervention' %}checked{% endif %}>
+          <label class="govuk-label govuk-radios__label" for="service_type-intervention">
+            Intervention service
+          </label>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <button class="govuk-button" data-module="govuk-button">Continue</button>
+</form>
+{% endblock %}
