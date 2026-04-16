@@ -1,0 +1,217 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2200 1250" role="img" aria-labelledby="title desc">
+  <title id="title">Hackathon 2026 high-level AWS architecture</title>
+  <desc id="desc">A clean high-level architecture diagram for the Hackathon 2026 AWS setup showing users, a public EC2 host with an Elastic IP inside a VPC, Cognito, DynamoDB, Secrets Manager, CloudWatch, Systems Manager, and GOV.UK Notify.</desc>
+  <!--
+    Visual references used:
+    - AWS Architecture Icons: https://aws.amazon.com/architecture/icons/
+    - AWS Prescriptive Guidance diagrams: https://docs.aws.amazon.com/prescriptive-guidance/
+  -->
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .cloud { fill: #f4f7fb; stroke: #94a3b8; stroke-width: 2.5; rx: 34; ry: 34; }
+      .zone { fill: #eef6ff; stroke: #60a5fa; stroke-width: 2.5; rx: 28; ry: 28; }
+      .subnet { fill: #ffffff; stroke: #93c5fd; stroke-width: 2; stroke-dasharray: 10 8; rx: 24; ry: 24; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 22; ry: 22; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 20; ry: 20; filter: url(#shadow); }
+      .title { font-family: "Segoe UI", Arial, sans-serif; font-size: 36px; font-weight: 700; fill: #0f172a; }
+      .subtitle { font-family: "Segoe UI", Arial, sans-serif; font-size: 18px; font-weight: 500; fill: #475569; }
+      .section { font-family: "Segoe UI", Arial, sans-serif; font-size: 26px; font-weight: 700; fill: #0f172a; }
+      .service { font-family: "Segoe UI", Arial, sans-serif; font-size: 21px; font-weight: 700; fill: #0f172a; }
+      .body { font-family: "Segoe UI", Arial, sans-serif; font-size: 16px; font-weight: 500; fill: #334155; }
+      .small { font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; font-weight: 500; fill: #475569; }
+      .footer { font-family: "Segoe UI", Arial, sans-serif; font-size: 18px; font-weight: 600; fill: #334155; }
+      .line { fill: none; stroke: #475569; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+      .chip { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1; rx: 10; ry: 10; }
+      .icon-stroke { stroke: #ffffff; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .icon-fill { fill: #ffffff; }
+    </style>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#94a3b8" flood-opacity="0.16"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <symbol id="icon-users" viewBox="0 0 48 48">
+      <circle class="icon-stroke" cx="17" cy="16" r="6"/>
+      <circle class="icon-stroke" cx="31" cy="18" r="5"/>
+      <path class="icon-stroke" d="M10 33c0-5 4-9 9-9h2c5 0 9 4 9 9"/>
+      <path class="icon-stroke" d="M27 33c0-4 3-7 7-7h1"/>
+    </symbol>
+    <symbol id="icon-network" viewBox="0 0 48 48">
+      <circle class="icon-stroke" cx="13" cy="13" r="4"/>
+      <circle class="icon-stroke" cx="35" cy="13" r="4"/>
+      <circle class="icon-stroke" cx="24" cy="33" r="4"/>
+      <path class="icon-stroke" d="M17 13h14"/>
+      <path class="icon-stroke" d="M16 16l6 13"/>
+      <path class="icon-stroke" d="M32 16l-6 13"/>
+    </symbol>
+    <symbol id="icon-server" viewBox="0 0 48 48">
+      <rect class="icon-stroke" x="10" y="10" width="28" height="11" rx="3"/>
+      <rect class="icon-stroke" x="10" y="26" width="28" height="11" rx="3"/>
+      <circle class="icon-fill" cx="15" cy="16" r="1.8"/>
+      <circle class="icon-fill" cx="15" cy="32" r="1.8"/>
+      <path class="icon-stroke" d="M21 16h12"/>
+      <path class="icon-stroke" d="M21 32h12"/>
+    </symbol>
+    <symbol id="icon-id" viewBox="0 0 48 48">
+      <rect class="icon-stroke" x="9" y="11" width="30" height="24" rx="4"/>
+      <circle class="icon-stroke" cx="19" cy="22" r="4.5"/>
+      <path class="icon-stroke" d="M14 31c1.5-3 4-4.5 7-4.5s5.5 1.5 7 4.5"/>
+      <path class="icon-stroke" d="M29 18h6"/>
+      <path class="icon-stroke" d="M29 23h6"/>
+    </symbol>
+    <symbol id="icon-db" viewBox="0 0 48 48">
+      <ellipse class="icon-stroke" cx="24" cy="14" rx="12" ry="5"/>
+      <path class="icon-stroke" d="M12 14v9c0 2.8 5.4 5 12 5s12-2.2 12-5v-9"/>
+      <path class="icon-stroke" d="M12 23v9c0 2.8 5.4 5 12 5s12-2.2 12-5v-9"/>
+    </symbol>
+    <symbol id="icon-key" viewBox="0 0 48 48">
+      <circle class="icon-stroke" cx="17" cy="21" r="7"/>
+      <path class="icon-stroke" d="M23 21h14"/>
+      <path class="icon-stroke" d="M31 21v6"/>
+      <path class="icon-stroke" d="M36 21v4"/>
+    </symbol>
+    <symbol id="icon-chart" viewBox="0 0 48 48">
+      <path class="icon-stroke" d="M10 36V12"/>
+      <path class="icon-stroke" d="M10 36h28"/>
+      <path class="icon-stroke" d="M14 29l7-8 6 4 9-11"/>
+      <circle class="icon-fill" cx="14" cy="29" r="2"/>
+      <circle class="icon-fill" cx="21" cy="21" r="2"/>
+      <circle class="icon-fill" cx="27" cy="25" r="2"/>
+      <circle class="icon-fill" cx="36" cy="14" r="2"/>
+    </symbol>
+    <symbol id="icon-terminal" viewBox="0 0 48 48">
+      <rect class="icon-stroke" x="8" y="10" width="32" height="26" rx="3"/>
+      <path class="icon-stroke" d="M14 18l5 4-5 4"/>
+      <path class="icon-stroke" d="M24 28h8"/>
+    </symbol>
+    <symbol id="icon-mail" viewBox="0 0 48 48">
+      <rect class="icon-stroke" x="8" y="12" width="32" height="24" rx="3"/>
+      <path class="icon-stroke" d="M10 15l14 11 14-11"/>
+    </symbol>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="2200" height="1250"/>
+
+  <text class="title" x="60" y="70">Hackathon 2026 | High-level AWS architecture</text>
+  <text class="subtitle" x="60" y="106">Clean runtime view based on the current Terraform stacks in eu-west-2</text>
+
+  <rect class="panel" x="60" y="500" width="240" height="180"/>
+  <rect x="88" y="528" width="58" height="58" rx="16" ry="16" fill="#475569"/>
+  <use href="#icon-users" x="93" y="533" width="48" height="48"/>
+  <text class="section" x="166" y="564">Users</text>
+  <text class="body" x="88" y="624">Referrers</text>
+  <text class="body" x="88" y="652">Referred families</text>
+
+  <rect class="cloud" x="340" y="150" width="1500" height="940"/>
+  <text class="section" x="380" y="208">AWS Cloud</text>
+  <text class="small" x="535" y="208">Region: eu-west-2</text>
+
+  <rect class="zone" x="410" y="280" width="560" height="600"/>
+  <text class="section" x="448" y="336">VPC</text>
+  <text class="small" x="510" y="336">10.42.0.0/16</text>
+
+  <rect class="subnet" x="470" y="370" width="440" height="420"/>
+  <text class="service" x="500" y="420">Public subnet</text>
+  <text class="small" x="705" y="420">10.42.0.0/24</text>
+
+  <rect class="card" x="570" y="410" width="240" height="96"/>
+  <rect x="592" y="432" width="46" height="46" rx="12" ry="12" fill="#2563eb"/>
+  <use href="#icon-network" x="599" y="439" width="32" height="32"/>
+  <text class="service" x="656" y="452">Elastic IP</text>
+  <text class="body" x="656" y="479">Public entry point</text>
+
+  <rect class="card" x="520" y="540" width="340" height="180"/>
+  <rect x="546" y="566" width="52" height="52" rx="14" ry="14" fill="#f97316"/>
+  <use href="#icon-server" x="556" y="576" width="32" height="32"/>
+  <text class="service" x="622" y="592">EC2 hosting instance</text>
+  <text class="body" x="622" y="620">Nginx + Gunicorn + Flask</text>
+  <text class="body" x="622" y="648">Single public app host</text>
+  <text class="small" x="622" y="676">t3.small | SSM only | user_data bootstraps app from GitHub main</text>
+
+  <rect class="card" x="1040" y="290" width="360" height="140"/>
+  <rect x="1066" y="316" width="52" height="52" rx="14" ry="14" fill="#ef4444"/>
+  <use href="#icon-id" x="1076" y="326" width="32" height="32"/>
+  <text class="service" x="1140" y="340">Amazon Cognito</text>
+  <text class="body" x="1140" y="368">User Pool: hackathon-2026-app-users</text>
+  <text class="body" x="1140" y="394">Referrer registration and sign-in</text>
+
+  <rect class="card" x="1430" y="290" width="360" height="150"/>
+  <rect x="1456" y="316" width="52" height="52" rx="14" ry="14" fill="#6366f1"/>
+  <use href="#icon-db" x="1466" y="326" width="32" height="32"/>
+  <text class="service" x="1530" y="340">Amazon DynamoDB</text>
+  <text class="body" x="1530" y="368">Table: hackathon-2026-app-data</text>
+  <text class="body" x="1530" y="394">Profiles, per-form access and referrals</text>
+  <text class="small" x="1530" y="420">Lookup by user ID and referral reference</text>
+
+  <rect class="card" x="1040" y="480" width="360" height="136"/>
+  <rect x="1066" y="506" width="52" height="52" rx="14" ry="14" fill="#dc2626"/>
+  <use href="#icon-key" x="1076" y="516" width="32" height="32"/>
+  <text class="service" x="1140" y="530">AWS Secrets Manager</text>
+  <text class="body" x="1140" y="558">Secret: hackathon-2026-notify_api_key</text>
+  <text class="body" x="1140" y="584">Notify API key for outbound emails</text>
+
+  <rect class="card" x="1430" y="480" width="360" height="136"/>
+  <rect x="1456" y="506" width="52" height="52" rx="14" ry="14" fill="#6366f1"/>
+  <use href="#icon-db" x="1466" y="516" width="32" height="32"/>
+  <text class="service" x="1530" y="530">Amazon DynamoDB</text>
+  <text class="body" x="1530" y="558">Table: hackathon-2026-referrer-details</text>
+  <text class="body" x="1530" y="584">Saved defaults for the referrer step</text>
+
+  <rect class="card" x="1040" y="700" width="360" height="120"/>
+  <rect x="1066" y="726" width="52" height="52" rx="14" ry="14" fill="#059669"/>
+  <use href="#icon-chart" x="1076" y="736" width="32" height="32"/>
+  <text class="service" x="1140" y="748">Amazon CloudWatch</text>
+  <text class="body" x="1140" y="776">App and nginx log groups</text>
+
+  <rect class="card" x="1430" y="700" width="360" height="120"/>
+  <rect x="1456" y="726" width="52" height="52" rx="14" ry="14" fill="#059669"/>
+  <use href="#icon-terminal" x="1466" y="736" width="32" height="32"/>
+  <text class="service" x="1530" y="748">AWS Systems Manager</text>
+  <text class="body" x="1530" y="776">Session Manager admin access</text>
+
+  <rect class="panel" x="1880" y="520" width="260" height="120"/>
+  <rect x="1906" y="546" width="52" height="52" rx="14" ry="14" fill="#d97706"/>
+  <use href="#icon-mail" x="1916" y="556" width="32" height="32"/>
+  <text class="service" x="1980" y="568">GOV.UK Notify</text>
+  <text class="body" x="1980" y="596">Registration and referral</text>
+  <text class="body" x="1980" y="622">login-details emails</text>
+
+  <path class="line" d="M300 590 H440 V458 H570"/>
+  <rect class="chip" x="356" y="466" width="70" height="28"/>
+  <text class="small" x="372" y="485">HTTPS</text>
+
+  <path class="line" d="M570 458 H450 V630 H520"/>
+
+  <path class="line" d="M860 612 H900 V360 H1040"/>
+  <rect class="chip" x="884" y="346" width="136" height="28"/>
+  <text class="small" x="900" y="365">register / sign in</text>
+
+  <path class="line" d="M860 600 H920 V250 H1610 V290"/>
+  <rect class="chip" x="1235" y="234" width="104" height="28"/>
+  <text class="small" x="1253" y="253">read / write</text>
+
+  <path class="line" d="M860 624 H940 V440 H1220 V480"/>
+  <rect class="chip" x="1055" y="424" width="110" height="28"/>
+  <text class="small" x="1073" y="443">read secret</text>
+
+  <path class="line" d="M860 648 H980 V656 H1610 V616"/>
+  <rect class="chip" x="1220" y="632" width="104" height="28"/>
+  <text class="small" x="1238" y="651">read / write</text>
+
+  <path class="line" d="M690 720 V900 H1220 V820"/>
+  <rect class="chip" x="860" y="884" width="52" height="28"/>
+  <text class="small" x="874" y="903">logs</text>
+
+  <path class="line" d="M860 672 H1240 V940 H1610 V820"/>
+  <rect class="chip" x="1310" y="924" width="104" height="28"/>
+  <text class="small" x="1327" y="943">admin access</text>
+
+  <path class="line" d="M860 660 H1810 V580 H1880"/>
+  <rect class="chip" x="1410" y="644" width="98" height="28"/>
+  <text class="small" x="1428" y="663">send emails</text>
+
+  <rect class="panel" x="60" y="1136" width="2080" height="60"/>
+  <text class="footer" x="86" y="1174">Current state: single-instance hosting with one Elastic IP. Terraform remote state lives in s3://hackathon-state-ctrl-atl-defeat.</text>
+</svg>
