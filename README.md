@@ -64,6 +64,7 @@ Then open `http://localhost:5000`.
 
 Uses the shared S3 backend bucket `hackathon-state-ctrl-atl-defeat`.
 
+You require valid AWS cli credentials to update this app
 ```powershell
 $env:AWS_PROFILE='co-hackathon'
 
