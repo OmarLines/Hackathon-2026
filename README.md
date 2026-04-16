@@ -11,7 +11,7 @@ Test admin username: `admin`
 
 Test admin password: `admin`
 
-You cna also sign up for a new account to test it.
+You can also sign up for a new account to test it.
 
 
 ## The Problem: Paper-Based Friction
