@@ -1,0 +1,10 @@
+tmp/
+tmp*/
+tmp_*
+
+# Terraform generated artifacts
+infra/**/.terraform/
+infra/**/*.tfplan
+infra/**/*.tfstate
+infra/**/*.tfstate.*
+infra/**/crash.log
