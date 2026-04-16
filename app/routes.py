@@ -71,19 +71,19 @@ def validate_address(data):
         errors["address_line1"] = "Enter the first line of the address"
     if not data.get("town", "").strip():
         errors["town"] = "Enter the town or city"
-    
+
     postcode = data.get("postcode", "").strip().upper()
     if not postcode:
         errors["postcode"] = "Enter the postcode"
     elif not re.match(r"^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$", postcode):
         errors["postcode"] = "Enter a real postcode"
-        
+
     tel_no = data.get("tel_no", "").strip()
     if not tel_no:
         errors["tel_no"] = "Enter a telephone number"
     elif not re.match(r"^[0-9\s\+\-\(\)]{7,20}$", tel_no):
         errors["tel_no"] = "Enter a real telephone number"
-        
+
     return errors
 
 
@@ -91,11 +91,13 @@ def validate_parent(data):
     errors = {}
     if not data.get("parent_name", "").strip():
         errors["parent_name"] = "Enter the parent or carer's name"
-    
+
     email = data.get("parent_email", "").strip()
-    if email and not re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
+    if email and not re.match(
+        r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email
+    ):
         errors["parent_email"] = "Enter a real email address"
-        
+
     day = data.get("parent_dob_day", "").strip()
     month = data.get("parent_dob_month", "").strip()
     year = data.get("parent_dob_year", "").strip()
@@ -109,11 +111,11 @@ def validate_parent(data):
                     errors["parent_dob"] = "Date of birth must be in the past"
             except ValueError:
                 errors["parent_dob"] = "Enter a real date of birth"
-                
+
     family_tel = data.get("family_tel", "").strip()
     if family_tel and not re.match(r"^[0-9\s\+\-\(\)]{7,20}$", family_tel):
         errors["family_tel"] = "Enter a real telephone number"
-        
+
     if not data.get("locality", "").strip():
         errors["locality"] = "Enter the locality"
     return errors
