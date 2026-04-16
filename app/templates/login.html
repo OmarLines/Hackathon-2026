@@ -54,8 +54,7 @@
           </div>
         </div>
 
-        <div class="govuk-radios__conditional {% if form.get('user_type') != 'referrer' %}govuk-radios__conditional--hidden{% endif %}"
-             id="referrer-fields">
+        <div id="referrer-fields" style="display:none; margin-left: 2rem; margin-top: 1rem">
 
           <div class="govuk-form-group {% if errors.referrer_login %}govuk-form-group--error{% endif %}">
             <label class="govuk-label" for="email">Email address</label>
@@ -95,8 +94,7 @@
           </div>
         </div>
 
-        <div class="govuk-radios__conditional {% if form.get('user_type') != 'referee' %}govuk-radios__conditional--hidden{% endif %}"
-             id="referee-fields">
+        <div id="referee-fields" style="display:none; margin-left: 2rem; margin-top: 1rem">
 
           <div class="govuk-form-group {% if errors.referee_login %}govuk-form-group--error{% endif %}">
             <label class="govuk-label" for="ref_number">Reference number</label>
@@ -132,4 +130,20 @@
   Are you a referrer without an account?
   <a href="{{ url_for('auth.register') }}" class="govuk-link">Create a referrer account</a>
 </p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const radios = document.querySelectorAll('input[name="user_type"]');
+  const panels = { referrer: document.getElementById('referrer-fields'), referee: document.getElementById('referee-fields') };
+
+  function updatePanels() {
+    const selected = document.querySelector('input[name="user_type"]:checked');
+    panels.referrer.style.display = (selected && selected.value === 'referrer') ? 'block' : 'none';
+    panels.referee.style.display  = (selected && selected.value === 'referee')  ? 'block' : 'none';
+  }
+
+  radios.forEach(r => r.addEventListener('change', updatePanels));
+  updatePanels();
+</script>
 {% endblock %}

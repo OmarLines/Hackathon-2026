@@ -142,7 +142,11 @@ def login():
                 return redirect(url_for("auth.dashboard"))
             errors["referee_login"] = "Incorrect reference number or postcode"
 
-    return render_template("login.html", errors=errors, form=request.form if request.method == "POST" else {})
+    return render_template(
+        "login.html",
+        errors=errors,
+        form=request.form if request.method == "POST" else {},
+    )
 
 
 @auth_bp.route("/logout")
