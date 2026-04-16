@@ -25,6 +25,10 @@ class InvalidReferrerPasswordError(RuntimeError):
     pass
 
 
+class InvalidReferrerEmailError(RuntimeError):
+    pass
+
+
 class AppBackend(Protocol):
     def authenticate_referee(
         self, ref_number: str, postcode: str
@@ -36,6 +40,7 @@ class AppBackend(Protocol):
         self, user: dict[str, Any], answers: dict[str, Any], ref_number: str
     ) -> dict[str, Any]: ...
     def get_referral(self, ref_number: str) -> dict[str, Any] | None: ...
+    def update_referral_status(self, ref_number: str, status: str) -> None: ...
     def get_referrer_profile(self, user: dict[str, Any]) -> dict[str, Any]: ...
     def get_saved_referrer_details(self, user: dict[str, Any]) -> dict[str, str]: ...
     def hydrate_referrer_user(self, user: dict[str, Any]) -> dict[str, Any] | None: ...
@@ -186,6 +191,7 @@ class LocalBackend:
             "ref_number": ref_number,
             "referrer_email": user["email"],
             "referrer_name": user.get("name", ""),
+            "status": "sent",
             "user_id": user.get("sub"),
         }
         referees[ref_number] = referral
@@ -199,6 +205,11 @@ class LocalBackend:
 
     def get_referral(self, ref_number: str) -> dict[str, Any] | None:
         return referees.get(ref_number)
+
+    def update_referral_status(self, ref_number: str, status: str) -> None:
+        referral = referees.get(ref_number)
+        if referral:
+            referral["status"] = status
 
     def _ensure_referrer_defaults(self, email: str, referrer: dict[str, Any]) -> None:
         referrer.setdefault("form_access", {self.form_id})
@@ -270,6 +281,7 @@ class AwsBackend:
             )
         except ClientError as error:
             error_code = error.response["Error"]["Code"]
+            error_message = error.response["Error"].get("Message", "")
             if error_code in {"AliasExistsException", "UsernameExistsException"}:
                 raise DuplicateReferrerError from error
             if created_cognito_user:
@@ -277,13 +289,18 @@ class AwsBackend:
                     self.cognito_user.delete_user(
                         userpool_id=self.user_pool_id, username=email
                     )
-            if error_code in {"InvalidParameterException", "InvalidPasswordException"}:
+            if error_code == "InvalidPasswordException":
                 raise InvalidReferrerPasswordError(
-                    error.response["Error"].get(
-                        "Message",
-                        "Password does not meet the required policy",
-                    )
+                    error_message or "Password does not meet the required policy"
                 ) from error
+            if error_code == "InvalidParameterException":
+                lowered_message = error_message.lower()
+                if "username should be an email" in lowered_message:
+                    raise InvalidReferrerEmailError(error_message) from error
+                if "password" in lowered_message:
+                    raise InvalidReferrerPasswordError(
+                        error_message or "Password does not meet the required policy"
+                    ) from error
             raise
 
         cognito_user = self.cognito_user.get_user_by_email(
@@ -490,6 +507,7 @@ class AwsBackend:
             "referrer_email": user["email"],
             "referrer_name": user.get("name", ""),
             "sk": self._referral_sk(ref_number),
+            "status": "sent",
             "user_id": user["sub"],
         }
         self.referrals_table.put_item(
@@ -511,6 +529,18 @@ class AwsBackend:
         )
         items = response.get("Items", [])
         return items[0] if items else None
+
+    def update_referral_status(self, ref_number: str, status: str) -> None:
+        referral = self.get_referral(ref_number)
+        if not referral:
+            return
+
+        self.table.update_item(
+            Key={"pk": referral["pk"], "sk": referral["sk"]},
+            UpdateExpression="SET #s = :s",
+            ExpressionAttributeNames={"#s": "status"},
+            ExpressionAttributeValues={":s": status},
+        )
 
     def _form_access_sk(self, form_id: str) -> str:
         return f"FORM_ACCESS#{form_id}"

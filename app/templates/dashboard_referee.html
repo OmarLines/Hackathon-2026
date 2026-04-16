@@ -19,9 +19,7 @@
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Date of birth</dt>
-        <dd class="govuk-summary-list__value">
-          {{ referral.answers.child_dob_day }}/{{ referral.answers.child_dob_month }}/{{ referral.answers.child_dob_year }}
-        </dd>
+        <dd class="govuk-summary-list__value">{{ referral.answers.child_dob }}</dd>
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Gender</dt>
@@ -39,7 +37,25 @@
         <dt class="govuk-summary-list__key">Service</dt>
         <dd class="govuk-summary-list__value">{{ referral.answers.service }}</dd>
       </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Status</dt>
+        <dd class="govuk-summary-list__value">
+          {% if referral.status == 'accepted' %}
+            <strong class="govuk-tag govuk-tag--green">Accepted</strong>
+          {% else %}
+            <strong class="govuk-tag govuk-tag--blue">Pending</strong>
+          {% endif %}
+        </dd>
+      </div>
     </dl>
+
+    {% if referral.status != 'accepted' %}
+    <form action="{{ url_for('main.accept_referral', ref_number=referral.ref_number) }}" method="post">
+      <button type="submit" class="govuk-button" data-module="govuk-button">
+        Accept this referral
+      </button>
+    </form>
+    {% endif %}
 
     <h2 class="govuk-heading-m">What happens next</h2>
     <p class="govuk-body">

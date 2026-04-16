@@ -1,11 +1,10 @@
-import uuid
 import re
+import uuid
 from datetime import date
 from typing import Any, Callable, TypeVar
 
 from flask import (
     Blueprint,
-    Response,
     abort,
     current_app,
     redirect,
@@ -14,6 +13,7 @@ from flask import (
     session,
     url_for,
 )
+from flask.typing import ResponseReturnValue
 
 from .backend import get_backend
 from .notifications import get_notifier
@@ -73,14 +73,12 @@ def validate_child(data: dict[str, str]) -> dict[str, str]:
     errors: dict[str, str] = {}
     if not data.get("child_name", "").strip():
         errors["child_name"] = "Enter the child's name"
-    day: str = data.get("child_dob_day", "")
-    month: str = data.get("child_dob_month", "")
-    year: str = data.get("child_dob_year", "")
-    if not day or not month or not year:
+    dob_str: str = data.get("child_dob", "")
+    if not dob_str:
         errors["child_dob"] = "Enter the child's date of birth"
     else:
         try:
-            dob: date = date(int(year), int(month), int(day))
+            dob: date = date.fromisoformat(dob_str)
             if dob > date.today():
                 errors["child_dob"] = "Date of birth must be in the past"
         except ValueError:
@@ -118,24 +116,21 @@ def validate_parent(data: dict[str, str]) -> dict[str, str]:
         errors["parent_name"] = "Enter the parent or carer's name"
 
     email: str = data.get("parent_email", "").strip()
-    if email and not re.match(
-        r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email
-    ):
+    if not email:
+        errors["parent_email"] = "Enter the parent or carer's email address"
+    elif not re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
         errors["parent_email"] = "Enter a real email address"
 
-    day: str = data.get("parent_dob_day", "").strip()
-    month: str = data.get("parent_dob_month", "").strip()
-    year: str = data.get("parent_dob_year", "").strip()
-    if day or month or year:
-        if not day or not month or not year:
-            errors["parent_dob"] = "Enter the parent's full date of birth"
-        else:
-            try:
-                dob: date = date(int(year), int(month), int(day))
-                if dob > date.today():
-                    errors["parent_dob"] = "Date of birth must be in the past"
-            except ValueError:
-                errors["parent_dob"] = "Enter a real date of birth"
+    dob_str: str = data.get("parent_dob", "").strip()
+    if not dob_str:
+        errors["parent_dob"] = "Enter the parent or carer's date of birth"
+    else:
+        try:
+            dob: date = date.fromisoformat(dob_str)
+            if dob > date.today():
+                errors["parent_dob"] = "Date of birth must be in the past"
+        except ValueError:
+            errors["parent_dob"] = "Enter a real date of birth"
 
     family_tel: str = data.get("family_tel", "").strip()
     if family_tel and not re.match(r"^[0-9\s\+\-\(\)]{7,20}$", family_tel):
@@ -152,14 +147,12 @@ def validate_referrer(data: dict[str, str]) -> dict[str, str]:
         errors["referrer_name"] = "Enter the referrer's name"
     if not data.get("role_agency", "").strip():
         errors["role_agency"] = "Enter the role or agency"
-    day: str = data.get("referral_date_day", "").strip()
-    month: str = data.get("referral_date_month", "").strip()
-    year: str = data.get("referral_date_year", "").strip()
-    if not day or not month or not year:
+    referral_date_str: str = data.get("referral_date", "").strip()
+    if not referral_date_str:
         errors["referral_date"] = "Enter the date of referral"
     else:
         try:
-            ref_date: date = date(int(year), int(month), int(day))
+            ref_date: date = date.fromisoformat(referral_date_str)
             if ref_date > date.today():
                 errors["referral_date"] = "Date of referral must be in the past"
         except ValueError:
@@ -203,30 +196,16 @@ VALIDATORS: dict[str, Callable[[dict[str, str]], dict[str, str]]] = {
 }
 
 FORM_FIELDS: dict[str, list[str]] = {
-    "child": [
-        "child_name",
-        "child_dob_day",
-        "child_dob_month",
-        "child_dob_year",
-        "gender",
-    ],
+    "child": ["child_name", "child_dob", "gender"],
     "address": ["address_line1", "address_line2", "town", "postcode", "tel_no"],
     "parent": [
         "parent_name",
         "parent_email",
-        "parent_dob_day",
-        "parent_dob_month",
-        "parent_dob_year",
+        "parent_dob",
         "family_tel",
         "locality",
     ],
-    "referrer": [
-        "referrer_name",
-        "role_agency",
-        "referral_date_day",
-        "referral_date_month",
-        "referral_date_year",
-    ],
+    "referrer": ["referrer_name", "role_agency", "referral_date"],
     "service_type": ["service_type"],
     "service_selection": ["service"],
     "additional_info": ["additional_info"],
@@ -258,7 +237,7 @@ SERVICE_LABELS: dict[str, str] = {
 
 
 @bp.route("/")
-def index() -> Response:
+def index() -> ResponseReturnValue:
     user: dict[str, Any] | None = session.get("user")
     if user:
         return redirect(url_for("auth.dashboard"))
@@ -267,7 +246,7 @@ def index() -> Response:
 
 @bp.route("/apply/start")
 @require_referrer
-def start() -> Response:
+def start() -> ResponseReturnValue:
     session.pop("ref", None)
     session.pop("answers", None)
     return redirect(url_for("main.step", step_name="child"))
@@ -275,7 +254,7 @@ def start() -> Response:
 
 @bp.route("/apply/<step_name>", methods=["GET", "POST"])
 @require_referrer
-def step(step_name: str) -> Response | str:
+def step(step_name: str) -> ResponseReturnValue:
     if step_name not in STEPS or step_name in ("check", "confirmation"):
         return redirect(url_for("main.index"))
 
@@ -340,7 +319,7 @@ def step(step_name: str) -> Response | str:
 
 @bp.route("/apply/check", methods=["GET", "POST"])
 @require_referrer
-def check() -> Response | str:
+def check() -> ResponseReturnValue:
     answers: dict[str, Any] = session.get("answers", {})
     if not answers:
         return redirect(url_for("main.index"))
@@ -379,7 +358,7 @@ def check() -> Response | str:
 
 @bp.route("/apply/confirmation")
 @require_referrer
-def confirmation() -> Response | str:
+def confirmation() -> ResponseReturnValue:
     ref: str | None = session.get("ref")
     if not ref:
         return redirect(url_for("main.index"))
@@ -387,3 +366,17 @@ def confirmation() -> Response | str:
     return render_template(
         "steps/confirmation.html", ref=ref, postcode=referee.get("postcode", "")
     )
+
+
+@bp.route("/referral/<ref_number>/accept", methods=["POST"])
+def accept_referral(ref_number: str) -> ResponseReturnValue:
+    user = session.get("user")
+    if (
+        not user
+        or user.get("type") != "referee"
+        or user.get("ref_number") != ref_number
+    ):
+        abort(403)
+
+    get_backend().update_referral_status(ref_number, "accepted")
+    return redirect(url_for("auth.dashboard"))

@@ -38,38 +38,15 @@
       <legend class="govuk-fieldset__legend">
         <span class="govuk-label">Date of birth</span>
       </legend>
-      <div id="child-dob-hint" class="govuk-hint">For example, 27 3 2018</div>
       {% if errors.child_dob %}
       <p id="child_dob-error" class="govuk-error-message">
         <span class="govuk-visually-hidden">Error:</span> {{ errors.child_dob }}
       </p>
       {% endif %}
-      <div class="govuk-date-input" id="child_dob">
-        <div class="govuk-date-input__item">
-          <div class="govuk-form-group">
-            <label class="govuk-label govuk-date-input__label" for="child_dob_day">Day</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.child_dob %}govuk-input--error{% endif %}"
-                   id="child_dob_day" name="child_dob_day" type="text" inputmode="numeric"
-                   value="{{ answers.child_dob_day or '' }}">
-          </div>
-        </div>
-        <div class="govuk-date-input__item">
-          <div class="govuk-form-group">
-            <label class="govuk-label govuk-date-input__label" for="child_dob_month">Month</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.child_dob %}govuk-input--error{% endif %}"
-                   id="child_dob_month" name="child_dob_month" type="text" inputmode="numeric"
-                   value="{{ answers.child_dob_month or '' }}">
-          </div>
-        </div>
-        <div class="govuk-date-input__item">
-          <div class="govuk-form-group">
-            <label class="govuk-label govuk-date-input__label" for="child_dob_year">Year</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-4 {% if errors.child_dob %}govuk-input--error{% endif %}"
-                   id="child_dob_year" name="child_dob_year" type="text" inputmode="numeric"
-                   value="{{ answers.child_dob_year or '' }}">
-          </div>
-        </div>
-      </div>
+      <input class="govuk-input govuk-input--width-10 {% if errors.child_dob %}govuk-input--error{% endif %}"
+             id="child_dob" name="child_dob" type="date"
+             aria-describedby="{% if errors.child_dob %}child_dob-error{% endif %}"
+             value="{{ answers.child_dob or '' }}">
     </fieldset>
   </div>
 

@@ -14,7 +14,7 @@
   </div>
   <div class="govuk-summary-list__row">
     <dt class="govuk-summary-list__key">Date of birth</dt>
-    <dd class="govuk-summary-list__value">{{ answers.child_dob_day }}/{{ answers.child_dob_month }}/{{ answers.child_dob_year }}</dd>
+    <dd class="govuk-summary-list__value">{{ answers.child_dob }}</dd>
     <dd class="govuk-summary-list__actions">
       <a class="govuk-link" href="{{ url_for('main.step', step_name='child') }}">Change<span class="govuk-visually-hidden"> child's date of birth</span></a>
     </dd>
@@ -105,7 +105,7 @@
   </div>
   <div class="govuk-summary-list__row">
     <dt class="govuk-summary-list__key">Date of referral</dt>
-    <dd class="govuk-summary-list__value">{{ answers.referral_date_day }}/{{ answers.referral_date_month }}/{{ answers.referral_date_year }}</dd>
+    <dd class="govuk-summary-list__value">{{ answers.referral_date }}</dd>
     <dd class="govuk-summary-list__actions">
       <a class="govuk-link" href="{{ url_for('main.step', step_name='referrer') }}">Change<span class="govuk-visually-hidden"> date of referral</span></a>
     </dd>

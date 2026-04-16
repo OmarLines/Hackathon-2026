@@ -3,3 +3,7 @@
 - [x] Add back buttons to the form
 - [x] Add some validation to the form elements
 - [x] Add a github action to lint with ruff using the latest action and to run all tests
+- [x] Add 'response' capability to family view (accept referral)
+- [x] Professionals can see acceptance status of referrals
+- [x] Resolve the type inconsistency in routes.py (standardized on flask.Response)
+- [x] Removed deprecated field in the pyproject.toml
