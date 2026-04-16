@@ -13,7 +13,7 @@ Test admin password: `admin`
 
 You can also sign up for a new account to test it.
 
-![Transformation diagram](./transformation_diagram.png)
+![Transformation diagram](docs/transformation_diagram.png)
 
 
 
