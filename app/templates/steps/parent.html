@@ -33,7 +33,7 @@
   </div>
 
   <div class="govuk-form-group {% if errors.parent_email %}govuk-form-group--error{% endif %}">
-    <label class="govuk-label" for="parent_email">Email address (optional)</label>
+    <label class="govuk-label" for="parent_email">Email address</label>
     {% if errors.parent_email %}
     <p id="parent_email-error" class="govuk-error-message">
       <span class="govuk-visually-hidden">Error:</span> {{ errors.parent_email }}
@@ -46,45 +46,16 @@
   </div>
 
   <div class="govuk-form-group {% if errors.parent_dob %}govuk-form-group--error{% endif %}">
-    <fieldset class="govuk-fieldset" role="group"
-              aria-describedby="parent-dob-hint {% if errors.parent_dob %}parent_dob-error{% endif %}">
-      <legend class="govuk-fieldset__legend">
-        <span class="govuk-label">Date of birth (optional)</span>
-      </legend>
-      <div id="parent-dob-hint" class="govuk-hint">For example, 14 6 1985</div>
-      {% if errors.parent_dob %}
-      <p id="parent_dob-error" class="govuk-error-message">
-        <span class="govuk-visually-hidden">Error:</span> {{ errors.parent_dob }}
-      </p>
-      {% endif %}
-      <div class="govuk-date-input" id="parent_dob">
-        <div class="govuk-date-input__item">
-          <div class="govuk-form-group">
-            <label class="govuk-label govuk-date-input__label" for="parent_dob_day">Day</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.parent_dob %}govuk-input--error{% endif %}"
-                   id="parent_dob_day" name="parent_dob_day" type="text" inputmode="numeric"
-                   value="{{ answers.parent_dob_day or '' }}">
-          </div>
-        </div>
-        <div class="govuk-date-input__item">
-          <div class="govuk-form-group">
-            <label class="govuk-label govuk-date-input__label" for="parent_dob_month">Month</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.parent_dob %}govuk-input--error{% endif %}"
-                   id="parent_dob_month" name="parent_dob_month" type="text" inputmode="numeric"
-                   value="{{ answers.parent_dob_month or '' }}">
-          </div>
-        </div>
-        <div class="govuk-date-input__item">
-          <div class="govuk-form-group">
-            <label class="govuk-label govuk-date-input__label" for="parent_dob_year">Year</label>
-            <input class="govuk-input govuk-date-input__input govuk-input--width-4 {% if errors.parent_dob %}govuk-input--error{% endif %}"
-                   id="parent_dob_year" name="parent_dob_year" type="text" inputmode="numeric"
-                   value="{{ answers.parent_dob_year or '' }}">
-          </div>
-        </div>
-      </div>
-    </fieldset>
-  </div>
+    <label class="govuk-label" for="parent_dob">Date of birth</label>
+    {% if errors.parent_dob %}
+    <p id="parent_dob-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.parent_dob }}
+    </p>
+    {% endif %}
+    <input class="govuk-input govuk-input--width-10 {% if errors.parent_dob %}govuk-input--error{% endif %}"
+           id="parent_dob" name="parent_dob" type="date"
+           aria-describedby="parent-dob-hint {% if errors.parent_dob %}parent_dob-error{% endif %}"
+           value="{{ answers.parent_dob or '' }}">
 
   <div class="govuk-form-group {% if errors.family_tel %}govuk-form-group--error{% endif %}">
     <label class="govuk-label" for="family_tel">Family telephone number (optional)</label>
