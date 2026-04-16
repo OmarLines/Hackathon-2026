@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Child's details{% endblock %}
+{% block content %}
+<form method="post" novalidate>
+  {% if errors %}
+  <div class="govuk-error-summary" data-module="govuk-error-summary">
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">There is a problem</h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          {% for field, msg in errors.items() %}
+          <li><a href="#{{ field }}">{{ msg }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">Child's details</h1>
+
+  <div class="govuk-form-group {% if errors.child_name %}govuk-form-group--error{% endif %}">
+    <label class="govuk-label" for="child_name">Child's name</label>
+    {% if errors.child_name %}
+    <p id="child_name-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.child_name }}
+    </p>
+    {% endif %}
+    <input class="govuk-input {% if errors.child_name %}govuk-input--error{% endif %}"
+           id="child_name" name="child_name" type="text" autocomplete="off"
+           aria-describedby="{% if errors.child_name %}child_name-error{% endif %}"
+           value="{{ answers.child_name or '' }}">
+  </div>
+
+  <div class="govuk-form-group {% if errors.child_dob %}govuk-form-group--error{% endif %}">
+    <fieldset class="govuk-fieldset" role="group"
+              aria-describedby="child-dob-hint {% if errors.child_dob %}child_dob-error{% endif %}">
+      <legend class="govuk-fieldset__legend">
+        <span class="govuk-label">Date of birth</span>
+      </legend>
+      <div id="child-dob-hint" class="govuk-hint">For example, 27 3 2018</div>
+      {% if errors.child_dob %}
+      <p id="child_dob-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors.child_dob }}
+      </p>
+      {% endif %}
+      <div class="govuk-date-input" id="child_dob">
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-date-input__label" for="child_dob_day">Day</label>
+            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.child_dob %}govuk-input--error{% endif %}"
+                   id="child_dob_day" name="child_dob_day" type="text" inputmode="numeric"
+                   value="{{ answers.child_dob_day or '' }}">
+          </div>
+        </div>
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-date-input__label" for="child_dob_month">Month</label>
+            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.child_dob %}govuk-input--error{% endif %}"
+                   id="child_dob_month" name="child_dob_month" type="text" inputmode="numeric"
+                   value="{{ answers.child_dob_month or '' }}">
+          </div>
+        </div>
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-date-input__label" for="child_dob_year">Year</label>
+            <input class="govuk-input govuk-date-input__input govuk-input--width-4 {% if errors.child_dob %}govuk-input--error{% endif %}"
+                   id="child_dob_year" name="child_dob_year" type="text" inputmode="numeric"
+                   value="{{ answers.child_dob_year or '' }}">
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="govuk-form-group {% if errors.gender %}govuk-form-group--error{% endif %}">
+    <label class="govuk-label" for="gender">Gender</label>
+    {% if errors.gender %}
+    <p id="gender-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.gender }}
+    </p>
+    {% endif %}
+    <input class="govuk-input govuk-input--width-one-half {% if errors.gender %}govuk-input--error{% endif %}"
+           id="gender" name="gender" type="text" autocomplete="off"
+           aria-describedby="{% if errors.gender %}gender-error{% endif %}"
+           value="{{ answers.gender or '' }}">
+  </div>
+
+  <button class="govuk-button" data-module="govuk-button">Continue</button>
+</form>
+{% endblock %}

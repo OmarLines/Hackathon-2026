@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Referrer details{% endblock %}
+{% block content %}
+<form method="post" novalidate>
+  {% if errors %}
+  <div class="govuk-error-summary" data-module="govuk-error-summary">
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">There is a problem</h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          {% for field, msg in errors.items() %}
+          <li><a href="#{{ field }}">{{ msg }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">Referrer details</h1>
+
+  <div class="govuk-form-group {% if errors.referrer_name %}govuk-form-group--error{% endif %}">
+    <label class="govuk-label" for="referrer_name">Referrer's name</label>
+    {% if errors.referrer_name %}
+    <p id="referrer_name-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.referrer_name }}
+    </p>
+    {% endif %}
+    <input class="govuk-input {% if errors.referrer_name %}govuk-input--error{% endif %}"
+           id="referrer_name" name="referrer_name" type="text" autocomplete="off"
+           aria-describedby="{% if errors.referrer_name %}referrer_name-error{% endif %}"
+           value="{{ answers.referrer_name or '' }}">
+  </div>
+
+  <div class="govuk-form-group {% if errors.role_agency %}govuk-form-group--error{% endif %}">
+    <label class="govuk-label" for="role_agency">Role or agency</label>
+    {% if errors.role_agency %}
+    <p id="role_agency-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.role_agency }}
+    </p>
+    {% endif %}
+    <input class="govuk-input {% if errors.role_agency %}govuk-input--error{% endif %}"
+           id="role_agency" name="role_agency" type="text" autocomplete="off"
+           aria-describedby="{% if errors.role_agency %}role_agency-error{% endif %}"
+           value="{{ answers.role_agency or '' }}">
+  </div>
+
+  <div class="govuk-form-group {% if errors.referral_date %}govuk-form-group--error{% endif %}">
+    <fieldset class="govuk-fieldset" role="group"
+              aria-describedby="referral-date-hint {% if errors.referral_date %}referral_date-error{% endif %}">
+      <legend class="govuk-fieldset__legend">
+        <span class="govuk-label">Date of referral</span>
+      </legend>
+      <div id="referral-date-hint" class="govuk-hint">For example, 16 4 2026</div>
+      {% if errors.referral_date %}
+      <p id="referral_date-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors.referral_date }}
+      </p>
+      {% endif %}
+      <div class="govuk-date-input" id="referral_date">
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-date-input__label" for="referral_date_day">Day</label>
+            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.referral_date %}govuk-input--error{% endif %}"
+                   id="referral_date_day" name="referral_date_day" type="text" inputmode="numeric"
+                   value="{{ answers.referral_date_day or '' }}">
+          </div>
+        </div>
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-date-input__label" for="referral_date_month">Month</label>
+            <input class="govuk-input govuk-date-input__input govuk-input--width-2 {% if errors.referral_date %}govuk-input--error{% endif %}"
+                   id="referral_date_month" name="referral_date_month" type="text" inputmode="numeric"
+                   value="{{ answers.referral_date_month or '' }}">
+          </div>
+        </div>
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-date-input__label" for="referral_date_year">Year</label>
+            <input class="govuk-input govuk-date-input__input govuk-input--width-4 {% if errors.referral_date %}govuk-input--error{% endif %}"
+                   id="referral_date_year" name="referral_date_year" type="text" inputmode="numeric"
+                   value="{{ answers.referral_date_year or '' }}">
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <button class="govuk-button" data-module="govuk-button">Continue</button>
+</form>
+{% endblock %}

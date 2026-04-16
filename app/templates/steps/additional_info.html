@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Additional information{% endblock %}
+{% block content %}
+<form method="post" novalidate>
+  <div class="govuk-form-group">
+    <h1 class="govuk-label-wrapper">
+      <label class="govuk-label govuk-label--l" for="additional_info">
+        Any other relevant information
+      </label>
+    </h1>
+    <div id="additional-info-hint" class="govuk-hint">
+      For example, CP, CIN, EHCP, plan requirements, DV risks. This is optional.
+    </div>
+    <textarea class="govuk-textarea" id="additional_info" name="additional_info"
+              rows="6" aria-describedby="additional-info-hint">{{ answers.additional_info or '' }}</textarea>
+  </div>
+
+  <button class="govuk-button" data-module="govuk-button">Continue</button>
+</form>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}What is your address?{% endblock %}
+{% block title %}Child's home address{% endblock %}
 {% block content %}
 <form method="post" novalidate>
   {% if errors %}
@@ -17,7 +17,7 @@
   </div>
   {% endif %}
 
-  <h1 class="govuk-heading-l">What is your address?</h1>
+  <h1 class="govuk-heading-l">Child's home address</h1>
 
   <div class="govuk-form-group {% if errors.address_line1 %}govuk-form-group--error{% endif %}">
     <label class="govuk-label" for="address_line1">Address line 1</label>
@@ -36,12 +36,6 @@
     <label class="govuk-label" for="address_line2">Address line 2 (optional)</label>
     <input class="govuk-input" id="address_line2" name="address_line2" type="text"
            autocomplete="address-line2" value="{{ answers.address_line2 or '' }}">
-  </div>
-
-  <div class="govuk-form-group">
-    <label class="govuk-label" for="address_line3">Address line 3 (optional)</label>
-    <input class="govuk-input" id="address_line3" name="address_line3" type="text"
-           value="{{ answers.address_line3 or '' }}">
   </div>
 
   <div class="govuk-form-group {% if errors.town %}govuk-form-group--error{% endif %}">
@@ -68,6 +62,19 @@
            id="postcode" name="postcode" type="text" autocomplete="postal-code"
            aria-describedby="{% if errors.postcode %}postcode-error{% endif %}"
            value="{{ answers.postcode or '' }}">
+  </div>
+
+  <div class="govuk-form-group {% if errors.tel_no %}govuk-form-group--error{% endif %}">
+    <label class="govuk-label" for="tel_no">Telephone number</label>
+    {% if errors.tel_no %}
+    <p id="tel_no-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ errors.tel_no }}
+    </p>
+    {% endif %}
+    <input class="govuk-input govuk-input--width-20 {% if errors.tel_no %}govuk-input--error{% endif %}"
+           id="tel_no" name="tel_no" type="tel" autocomplete="tel"
+           aria-describedby="{% if errors.tel_no %}tel_no-error{% endif %}"
+           value="{{ answers.tel_no or '' }}">
   </div>
 
   <button class="govuk-button" data-module="govuk-button">Continue</button>

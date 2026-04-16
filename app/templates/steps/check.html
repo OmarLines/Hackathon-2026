@@ -1,32 +1,40 @@
 {% extends "base.html" %}
 {% block title %}Check your answers{% endblock %}
 {% block content %}
-<h1 class="govuk-heading-l">Check your answers before sending your application</h1>
+<h1 class="govuk-heading-l">Check your answers before submitting the referral</h1>
 
+<h2 class="govuk-heading-m">Child</h2>
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-
   <div class="govuk-summary-list__row">
-    <dt class="govuk-summary-list__key">Full name</dt>
-    <dd class="govuk-summary-list__value">{{ answers.full_name }}</dd>
+    <dt class="govuk-summary-list__key">Name</dt>
+    <dd class="govuk-summary-list__value">{{ answers.child_name }}</dd>
     <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{{ url_for('main.step', step_name='name') }}">Change<span class="govuk-visually-hidden"> full name</span></a>
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='child') }}">Change<span class="govuk-visually-hidden"> child's name</span></a>
     </dd>
   </div>
-
   <div class="govuk-summary-list__row">
     <dt class="govuk-summary-list__key">Date of birth</dt>
-    <dd class="govuk-summary-list__value">{{ answers.dob_day }}/{{ answers.dob_month }}/{{ answers.dob_year }}</dd>
+    <dd class="govuk-summary-list__value">{{ answers.child_dob_day }}/{{ answers.child_dob_month }}/{{ answers.child_dob_year }}</dd>
     <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{{ url_for('main.step', step_name='dob') }}">Change<span class="govuk-visually-hidden"> date of birth</span></a>
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='child') }}">Change<span class="govuk-visually-hidden"> child's date of birth</span></a>
     </dd>
   </div>
-
   <div class="govuk-summary-list__row">
-    <dt class="govuk-summary-list__key">Address</dt>
+    <dt class="govuk-summary-list__key">Gender</dt>
+    <dd class="govuk-summary-list__value">{{ answers.gender }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='child') }}">Change<span class="govuk-visually-hidden"> gender</span></a>
+    </dd>
+  </div>
+</dl>
+
+<h2 class="govuk-heading-m">Address</h2>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Home address</dt>
     <dd class="govuk-summary-list__value">
       {{ answers.address_line1 }}<br>
       {% if answers.address_line2 %}{{ answers.address_line2 }}<br>{% endif %}
-      {% if answers.address_line3 %}{{ answers.address_line3 }}<br>{% endif %}
       {{ answers.town }}<br>
       {{ answers.postcode }}
     </dd>
@@ -34,35 +42,123 @@
       <a class="govuk-link" href="{{ url_for('main.step', step_name='address') }}">Change<span class="govuk-visually-hidden"> address</span></a>
     </dd>
   </div>
-
   <div class="govuk-summary-list__row">
-    <dt class="govuk-summary-list__key">Licence type</dt>
-    <dd class="govuk-summary-list__value">{{ answers.licence_type | capitalize }}</dd>
+    <dt class="govuk-summary-list__key">Telephone number</dt>
+    <dd class="govuk-summary-list__value">{{ answers.tel_no }}</dd>
     <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{{ url_for('main.step', step_name='licence_type') }}">Change<span class="govuk-visually-hidden"> licence type</span></a>
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='address') }}">Change<span class="govuk-visually-hidden"> telephone number</span></a>
     </dd>
   </div>
-
-  <div class="govuk-summary-list__row">
-    <dt class="govuk-summary-list__key">Previous licence number</dt>
-    <dd class="govuk-summary-list__value">{{ answers.previous_licence_number or 'Not provided' }}</dd>
-    <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{{ url_for('main.step', step_name='previous_licence') }}">Change<span class="govuk-visually-hidden"> previous licence number</span></a>
-    </dd>
-  </div>
-
-  <div class="govuk-summary-list__row">
-    <dt class="govuk-summary-list__key">Declaration</dt>
-    <dd class="govuk-summary-list__value">Agreed</dd>
-    <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{{ url_for('main.step', step_name='declaration') }}">Change<span class="govuk-visually-hidden"> declaration</span></a>
-    </dd>
-  </div>
-
 </dl>
 
-<h2 class="govuk-heading-m">Now send your application</h2>
-<p class="govuk-body">By submitting this application you confirm that the information is correct.</p>
+<h2 class="govuk-heading-m">Parent or carer</h2>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Name(s)</dt>
+    <dd class="govuk-summary-list__value">{{ answers.parent_name }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='parent') }}">Change<span class="govuk-visually-hidden"> parent name</span></a>
+    </dd>
+  </div>
+  {% if answers.parent_email %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Email address</dt>
+    <dd class="govuk-summary-list__value">{{ answers.parent_email }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='parent') }}">Change<span class="govuk-visually-hidden"> email address</span></a>
+    </dd>
+  </div>
+  {% endif %}
+  {% if answers.family_tel %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Family telephone</dt>
+    <dd class="govuk-summary-list__value">{{ answers.family_tel }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='parent') }}">Change<span class="govuk-visually-hidden"> family telephone</span></a>
+    </dd>
+  </div>
+  {% endif %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Locality</dt>
+    <dd class="govuk-summary-list__value">{{ answers.locality }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='parent') }}">Change<span class="govuk-visually-hidden"> locality</span></a>
+    </dd>
+  </div>
+</dl>
+
+<h2 class="govuk-heading-m">Referrer</h2>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Referrer's name</dt>
+    <dd class="govuk-summary-list__value">{{ answers.referrer_name }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='referrer') }}">Change<span class="govuk-visually-hidden"> referrer's name</span></a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Role or agency</dt>
+    <dd class="govuk-summary-list__value">{{ answers.role_agency }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='referrer') }}">Change<span class="govuk-visually-hidden"> role or agency</span></a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Date of referral</dt>
+    <dd class="govuk-summary-list__value">{{ answers.referral_date_day }}/{{ answers.referral_date_month }}/{{ answers.referral_date_year }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='referrer') }}">Change<span class="govuk-visually-hidden"> date of referral</span></a>
+    </dd>
+  </div>
+</dl>
+
+<h2 class="govuk-heading-m">Service requested</h2>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Service type</dt>
+    <dd class="govuk-summary-list__value">{{ answers.service_type | capitalize }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='service_type') }}">Change<span class="govuk-visually-hidden"> service type</span></a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Service</dt>
+    <dd class="govuk-summary-list__value">{{ service_labels.get(answers.service, answers.service) }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='service_selection') }}">Change<span class="govuk-visually-hidden"> service</span></a>
+    </dd>
+  </div>
+  {% if answers.additional_info %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Additional information</dt>
+    <dd class="govuk-summary-list__value">{{ answers.additional_info }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='additional_info') }}">Change<span class="govuk-visually-hidden"> additional information</span></a>
+    </dd>
+  </div>
+  {% endif %}
+</dl>
+
+<h2 class="govuk-heading-m">Consent</h2>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Sure Start registration</dt>
+    <dd class="govuk-summary-list__value">Confirmed</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='consent') }}">Change<span class="govuk-visually-hidden"> Sure Start registration</span></a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Verbal consent given</dt>
+    <dd class="govuk-summary-list__value">{{ answers.verbal_consent | capitalize }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ url_for('main.step', step_name='consent') }}">Change<span class="govuk-visually-hidden"> verbal consent</span></a>
+    </dd>
+  </div>
+</dl>
+
+<h2 class="govuk-heading-m">Now submit the referral</h2>
+<p class="govuk-body">By submitting this referral you confirm that the information provided is correct.</p>
 
 <form method="post">
   <button class="govuk-button" data-module="govuk-button">Accept and send</button>
