@@ -351,3 +351,13 @@ def confirmation() -> Response | str:
     return render_template(
         "steps/confirmation.html", ref=ref, postcode=referee.get("postcode", "")
     )
+
+
+@bp.route("/referral/<ref_number>/accept", methods=["POST"])
+def accept_referral(ref_number: str) -> Response:
+    user = session.get("user")
+    if not user or user.get("type") != "referee" or user.get("ref_number") != ref_number:
+        abort(403)
+
+    get_backend().update_referral_status(ref_number, "accepted")
+    return redirect(url_for("auth.dashboard"))
