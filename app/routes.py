@@ -260,6 +260,13 @@ def step(step_name: str) -> ResponseReturnValue:
 
     answers: dict[str, Any] = session.get("answers", {})
     errors: dict[str, str] = {}
+    current_user: dict[str, Any] = session["user"]
+
+    if step_name == "referrer":
+        saved_referrer_details = get_backend().get_saved_referrer_details(current_user)
+        for field in ("referrer_name", "role_agency"):
+            if not answers.get(field) and saved_referrer_details.get(field):
+                answers[field] = saved_referrer_details[field]
 
     if step_name == "service_selection" and not answers.get("service_type"):
         return redirect(url_for("main.step", step_name="service_type"))
@@ -282,6 +289,16 @@ def step(step_name: str) -> ResponseReturnValue:
             errors = validator(form_data)
 
         if not errors:
+            if step_name == "referrer":
+                referrer_name = str(answers.get("referrer_name", "")).strip()
+                role_agency = str(answers.get("role_agency", "")).strip()
+                answers["referrer_name"] = referrer_name
+                answers["role_agency"] = role_agency
+                get_backend().save_referrer_details(
+                    current_user,
+                    referrer_name=referrer_name,
+                    role_agency=role_agency,
+                )
             session["answers"] = answers
             return redirect(url_for("main.step", step_name=next_step(step_name)))
 

@@ -54,6 +54,15 @@ data "aws_iam_policy_document" "app_backend_access" {
 
   statement {
     actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:UpdateItem",
+    ]
+    resources = [data.terraform_remote_state.dynamodb.outputs.referrer_details_table_arn]
+  }
+
+  statement {
+    actions = [
       "secretsmanager:DescribeSecret",
       "secretsmanager:GetSecretValue",
     ]

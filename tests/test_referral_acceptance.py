@@ -23,9 +23,7 @@ def test_accept_referral_success(client):
         "status": "sent",
         "answers": {
             "child_name": "Test Child",
-            "child_dob_day": "01",
-            "child_dob_month": "01",
-            "child_dob_year": "2020",
+            "child_dob": "2020-01-01",
             "gender": "Male",
             "service_type": "prevention",
             "service": "brilliant_babies",
@@ -51,9 +49,7 @@ def test_create_referral_initial_status(client):
         sess["answers"] = {
             "child_name": "New Child",
             "postcode": "SW1A 1AA",
-            "child_dob_day": "01",
-            "child_dob_month": "01",
-            "child_dob_year": "2020",
+            "child_dob": "2020-01-01",
             "gender": "Female",
         }
 

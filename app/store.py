@@ -14,3 +14,6 @@ referrers = {
 # Referee accounts created on form submission, keyed by reference number
 # Each entry: { child_name, postcode, answers, referrer_email }
 referees = {}
+
+# Referrer details captured on the referral step, keyed by user sub
+referrer_details = {}

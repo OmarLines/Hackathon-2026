@@ -1,3 +1,8 @@
+from werkzeug.security import generate_password_hash
+
+from app.store import referrer_details, referrers
+
+
 def test_index_redirect_to_login(client):
     response = client.get("/", follow_redirects=True)
     assert "Sign in" in response.get_data(as_text=True)
@@ -285,3 +290,71 @@ def test_check_page_redirect_if_no_answers(client):
     response = client.get("/apply/check", follow_redirects=True)
     assert response.status_code == 200
     assert "Welcome, Test User" in response.get_data(as_text=True)
+
+
+def test_referrer_step_prefills_saved_details(client):
+    referrers.clear()
+    referrer_details.clear()
+    referrers["test@example.com"] = {
+        "form_access": {"children-centre-services"},
+        "name": "Test User",
+        "password_hash": generate_password_hash("password123"),
+        "referrals": [],
+        "sub": "user-123",
+    }
+    referrer_details["user-123"] = {
+        "referrer_name": "Saved Referrer",
+        "role_agency": "Saved Agency",
+    }
+
+    with client.session_transaction() as sess:
+        sess["user"] = {
+            "type": "referrer",
+            "email": "test@example.com",
+            "name": "Test User",
+            "sub": "user-123",
+        }
+
+    response = client.get("/apply/referrer")
+
+    data = response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert 'value="Saved Referrer"' in data
+    assert 'value="Saved Agency"' in data
+    assert 'id="referral_date_today"' in data
+
+
+def test_referrer_step_post_saves_details(client):
+    referrers.clear()
+    referrer_details.clear()
+    referrers["test@example.com"] = {
+        "form_access": {"children-centre-services"},
+        "name": "Test User",
+        "password_hash": generate_password_hash("password123"),
+        "referrals": [],
+        "sub": "user-123",
+    }
+
+    with client.session_transaction() as sess:
+        sess["user"] = {
+            "type": "referrer",
+            "email": "test@example.com",
+            "name": "Test User",
+            "sub": "user-123",
+        }
+
+    response = client.post(
+        "/apply/referrer",
+        data={
+            "referrer_name": "Jane Example",
+            "role_agency": "Health Visitor",
+            "referral_date": "2026-04-16",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert referrer_details["user-123"] == {
+        "referrer_name": "Jane Example",
+        "role_agency": "Health Visitor",
+    }

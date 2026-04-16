@@ -42,6 +42,7 @@ resource "aws_instance" "app" {
     notify_api_key_secret_name                = data.terraform_remote_state.cognito.outputs.notify_api_key_secret_name
     notify_referral_login_details_template_id = var.notify_referral_login_details_template_id
     notify_template_id                        = var.notify_referrer_registration_template_id
+    referrer_details_table_name               = data.terraform_remote_state.dynamodb.outputs.referrer_details_table_name
     referrer_password_min_length              = data.terraform_remote_state.cognito.outputs.password_policy.minimum_length
     referrer_password_require_lowercase       = data.terraform_remote_state.cognito.outputs.password_policy.require_lowercase
     referrer_password_require_numbers         = data.terraform_remote_state.cognito.outputs.password_policy.require_numbers
