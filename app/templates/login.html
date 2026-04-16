@@ -2,7 +2,7 @@
 {% block title %}Sign in{% endblock %}
 {% block content %}
 
-{% if errors.user_type or errors.referrer_login or errors.referee_login %}
+{% if errors.user_type or errors.referrer_login or errors.referee_login or errors.admin_login %}
 <div class="govuk-error-summary" data-module="govuk-error-summary">
   <div role="alert">
     <h2 class="govuk-error-summary__title">There is a problem</h2>
@@ -16,6 +16,9 @@
         {% endif %}
         {% if errors.referee_login %}
         <li><a href="#ref_number">{{ errors.referee_login }}</a></li>
+        {% endif %}
+        {% if errors.admin_login %}
+        <li><a href="#admin_username">{{ errors.admin_login }}</a></li>
         {% endif %}
       </ul>
     </div>
@@ -134,15 +137,16 @@
         <div id="admin-fields" style="display:none; margin-left: 2rem; margin-top: 1rem">
 
           <div class="govuk-form-group {% if errors.admin_login %}govuk-form-group--error{% endif %}">
-            <label class="govuk-label" for="admin_email">Admin email</label>
+            <label class="govuk-label" for="admin_username">Admin username</label>
             {% if errors.admin_login %}
-            <p id="admin_email-error" class="govuk-error-message">
+            <p id="admin_username-error" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> {{ errors.admin_login }}
             </p>
             {% endif %}
             <input class="govuk-input {% if errors.admin_login %}govuk-input--error{% endif %}"
-                   id="admin_email" name="admin_email" type="email" autocomplete="email"
-                   value="{{ form.get('admin_email', '') }}">
+                   id="admin_username" name="admin_username" type="text" autocomplete="username"
+                   aria-describedby="{% if errors.admin_login %}admin_username-error{% endif %}"
+                   value="{{ form.get('admin_username', '') }}">
           </div>
 
           <div class="govuk-form-group {% if errors.admin_login %}govuk-form-group--error{% endif %}">

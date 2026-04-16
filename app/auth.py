@@ -17,6 +17,7 @@ from .backend import (
     InvalidReferrerPasswordError,
     get_backend,
 )
+from .admin_credentials import get_admin_credentials
 from .notifications import get_notifier
 from .routes import SERVICE_LABELS
 
@@ -181,19 +182,26 @@ def login() -> Response | str:
             errors["referee_login"] = "Incorrect reference number or postcode"
 
         elif user_type == "admin":
-            email = request.form.get("admin_email", "").strip().lower()
+            username = request.form.get("admin_username", "").strip().lower()
             password = request.form.get("admin_password", "")
-            admin_email = current_app.config.get("ADMIN_EMAIL")
-            admin_password = current_app.config.get("ADMIN_PASSWORD")
+            admin_credentials = None
+            try:
+                admin_credentials = get_admin_credentials()
+            except Exception:
+                current_app.logger.exception("Failed to load admin credentials")
+
             if (
-                admin_email
-                and admin_password
-                and email == admin_email
-                and password == admin_password
+                admin_credentials
+                and username == admin_credentials["username"].strip().lower()
+                and password == admin_credentials["password"]
             ):
-                session["user"] = {"type": "admin", "email": email, "name": "Admin"}
+                session["user"] = {
+                    "type": "admin",
+                    "email": username,
+                    "name": "Admin",
+                }
                 return redirect(url_for("auth.admin_dashboard"))
-            errors["admin_login"] = "Incorrect admin email or password"
+            errors["admin_login"] = "Incorrect admin username or password"
 
     return render_template(
         "login.html",

@@ -51,6 +51,49 @@ def test_login_page(client):
     assert "Sign in" in response.get_data(as_text=True)
 
 
+def test_admin_login_success(client):
+    client.application.config.update(
+        {
+            "ADMIN_USERNAME": "admin",
+            "ADMIN_PASSWORD": "admin",
+        }
+    )
+
+    response = client.post(
+        "/login",
+        data={
+            "user_type": "admin",
+            "admin_username": "admin",
+            "admin_password": "admin",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert "Admin dashboard" in response.get_data(as_text=True)
+
+
+def test_admin_login_failure_message(client):
+    client.application.config.update(
+        {
+            "ADMIN_USERNAME": "admin",
+            "ADMIN_PASSWORD": "admin",
+        }
+    )
+
+    response = client.post(
+        "/login",
+        data={
+            "user_type": "admin",
+            "admin_username": "wrong",
+            "admin_password": "wrong",
+        },
+    )
+
+    assert response.status_code == 200
+    assert "Incorrect admin username or password" in response.get_data(as_text=True)
+
+
 def test_referrer_login_failure_message(client):
     response = client.post(
         "/login",

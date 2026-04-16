@@ -33,6 +33,16 @@ output "notify_api_key_secret_name" {
   value       = aws_secretsmanager_secret.notify_api_key.name
 }
 
+output "admin_credentials_secret_arn" {
+  description = "ARN of the admin username and password secret."
+  value       = aws_secretsmanager_secret.admin_credentials.arn
+}
+
+output "admin_credentials_secret_name" {
+  description = "Name of the admin username and password secret."
+  value       = aws_secretsmanager_secret.admin_credentials.name
+}
+
 output "password_policy" {
   description = "Password policy used by the Cognito user pool."
   value       = local.default_password_policy

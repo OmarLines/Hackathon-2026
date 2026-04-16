@@ -31,6 +31,7 @@ resource "aws_instance" "app" {
     app_repo_url                              = var.app_repository_url
     app_service_name                          = local.app_service_name
     app_user                                  = var.app_user
+    admin_credentials_secret_name             = data.terraform_remote_state.cognito.outputs.admin_credentials_secret_name
     aws_region                                = var.aws_region
     cognito_user_pool_client_id               = data.terraform_remote_state.cognito.outputs.cognito_user_pool_client_id
     cognito_user_pool_id                      = data.terraform_remote_state.cognito.outputs.cognito_user_pool_id

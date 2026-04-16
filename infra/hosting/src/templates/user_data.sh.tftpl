@@ -13,6 +13,7 @@ APP_REPO_REF="${app_repo_ref}"
 APP_REPO_URL="${app_repo_url}"
 APP_SERVICE_NAME="${app_service_name}"
 APP_USER="${app_user}"
+ADMIN_CREDENTIALS_SECRET_NAME="${admin_credentials_secret_name}"
 AWS_REGION="${aws_region}"
 COGNITO_USER_POOL_CLIENT_ID="${cognito_user_pool_client_id}"
 COGNITO_USER_POOL_ID="${cognito_user_pool_id}"
@@ -73,6 +74,7 @@ WorkingDirectory=${app_directory}
 Environment=HOME=${app_install_path}
 Environment=PATH=${app_install_path}/.local/bin:/usr/local/bin:/usr/bin:/bin
 Environment=APP_BACKEND=${app_backend}
+Environment=ADMIN_CREDENTIALS_SECRET_NAME=${admin_credentials_secret_name}
 Environment=AWS_REGION=${aws_region}
 Environment=COGNITO_USER_POOL_CLIENT_ID=${cognito_user_pool_client_id}
 Environment=COGNITO_USER_POOL_ID=${cognito_user_pool_id}

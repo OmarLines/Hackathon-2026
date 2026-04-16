@@ -50,3 +50,15 @@ variable "notify_api_key_secret_name" {
   type        = string
   default     = "hackathon-2026-notify_api_key"
 }
+
+variable "admin_credentials_secret_description" {
+  description = "Description for the admin username and password secret."
+  type        = string
+  default     = "Admin username and password for Hackathon 2026."
+}
+
+variable "admin_credentials_secret_name" {
+  description = "Secrets Manager name for the admin username and password secret."
+  type        = string
+  default     = "hackathon-2026-admin_credentials"
+}
