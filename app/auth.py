@@ -162,9 +162,14 @@ def dashboard():
         return redirect(url_for("auth.login"))
 
     if user["type"] == "referrer":
-        profile = get_backend().get_referrer_profile(user)
-        user = {**user, "name": profile["name"]}
-        submitted = get_backend().list_referrals_for_referrer(user)
+        hydrated_user = get_backend().hydrate_referrer_user(user)
+        if not hydrated_user:
+            session.clear()
+            return redirect(url_for("auth.login"))
+        session["user"] = hydrated_user
+        profile = get_backend().get_referrer_profile(hydrated_user)
+        user = {**hydrated_user, "name": profile["name"]}
+        submitted = get_backend().list_referrals_for_referrer(hydrated_user)
         return render_template("dashboard_referrer.html", user=user, referrals=submitted)
 
     referee = get_backend().get_referral(user["ref_number"]) or {}
