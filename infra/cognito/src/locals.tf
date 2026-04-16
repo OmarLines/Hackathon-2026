@@ -1,10 +1,10 @@
 locals {
   default_password_policy = {
-    minimum_length                   = 14
-    require_lowercase                = true
+    minimum_length                   = 8
+    require_lowercase                = false
     require_numbers                  = true
-    require_symbols                  = true
-    require_uppercase                = true
+    require_symbols                  = false
+    require_uppercase                = false
     temporary_password_validity_days = 7
   }
 
