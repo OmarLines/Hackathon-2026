@@ -409,9 +409,9 @@ class AwsBackend:
         }
 
     def get_saved_referrer_details(self, user: dict[str, Any]) -> dict[str, str]:
-        item = self.referrer_details_table.get_item(
-            Key={"user_id": user["sub"]}
-        ).get("Item", {})
+        item = self.referrer_details_table.get_item(Key={"user_id": user["sub"]}).get(
+            "Item", {}
+        )
         return {
             "referrer_name": str(item.get("referrer_name", "")),
             "role_agency": str(item.get("role_agency", "")),

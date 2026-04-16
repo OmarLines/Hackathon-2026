@@ -105,3 +105,6 @@ referees_data = {
         },
     },
 }
+
+# Referrer details keyed by sub
+referrer_details_data = {}
